@@ -13,8 +13,7 @@ import java.io.OutputStream;
 @Configuration
 public class TelnetConfig {
 
-
-    private final TelnetClient telnetClient = new TelnetClient();
+    private TelnetClient telnetClient = new TelnetClient();
 
     @Bean
     public TelnetClient telnetClient() {
@@ -22,12 +21,24 @@ public class TelnetConfig {
     }
 
     public String getConnection(String localIpaddress, int port) {
-        try{
+        try {
+            // Set the system property to prefer IPv6 addresses if needed
+            if (isIPv6Address(localIpaddress)) {
+                System.setProperty("java.net.preferIPv6Addresses", "true");
+            } else {
+                System.setProperty("java.net.preferIPv6Addresses", "false");
+            }
+
+            telnetClient = new TelnetClient();
             telnetClient.connect(localIpaddress, port);
             return "Connected to the server: " + localIpaddress;
         } catch (IOException e) {
             return "Failed to connect to the server: " + localIpaddress;
         }
+    }
+
+    private boolean isIPv6Address(String ipAddress) {
+        return ipAddress.contains(":");
     }
 
     public boolean getStatus() {
