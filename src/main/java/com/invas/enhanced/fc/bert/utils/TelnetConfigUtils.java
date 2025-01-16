@@ -44,12 +44,17 @@ public class TelnetConfigUtils {
             int bytesRead;
             StringBuilder response = new StringBuilder();
 
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
+
+            if ((bytesRead = inputStream.read(buffer)) != -1) {
+                response.append(new String(buffer, 0, bytesRead));
+            }
+
+            /*while ((bytesRead = inputStream.read(buffer)) != -1) {
                 response.append(new String(buffer, 0, bytesRead));
                 if (bytesRead < buffer.length) {
                     break;
                 }
-            }
+            }*/
             return response.toString();
         } else {
             return "Connection is not established";
