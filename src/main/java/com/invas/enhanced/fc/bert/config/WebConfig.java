@@ -15,16 +15,10 @@ public class WebConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("*SGINT") // Adjust the origin as needed
+                        .allowedOrigins("http://localhost:4200") // Adjust the origin as needed
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);
-            }
-
-            @Override
-            public void addResourceHandlers(ResourceHandlerRegistry registry) {
-                registry.addResourceHandler("/**")
-                        .addResourceLocations("classpath:/static/dist/");
             }
         };
     }

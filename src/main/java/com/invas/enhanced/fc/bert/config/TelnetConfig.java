@@ -20,21 +20,30 @@ public class TelnetConfig {
         return telnetClient;
     }
 
-    public String getConnection(String localIpaddress, int port) {
+    public String getConnection(String ipAddress, int port) {
         try {
-            // Set the system property to prefer IPv6 addresses if needed
-            if (isIPv6Address(localIpaddress)) {
-                System.setProperty("java.net.preferIPv6Addresses", "true");
+            if (isIPv6Address(ipAddress)) {
+                return connectIPv6(ipAddress, port);
             } else {
-                System.setProperty("java.net.preferIPv6Addresses", "false");
+                return connectIPv4(ipAddress, port);
             }
-
-            telnetClient = new TelnetClient();
-            telnetClient.connect(localIpaddress, port);
-            return "Connected to the server: " + localIpaddress;
         } catch (IOException e) {
-            return "Failed to connect to the server: " + localIpaddress;
+            return "Failed to connect to the server: " + ipAddress;
         }
+    }
+
+    private String connectIPv6(String ipAddress, int port) throws IOException {
+        System.setProperty("java.net.preferIPv6Addresses", "true");
+        telnetClient = new TelnetClient();
+        telnetClient.connect(ipAddress, port);
+        return "Connected to the server: " + ipAddress;
+    }
+
+    private String connectIPv4(String ipAddress, int port) throws IOException {
+        System.setProperty("java.net.preferIPv6Addresses", "false");
+        telnetClient = new TelnetClient();
+        telnetClient.connect(ipAddress, port);
+        return "Connected to the server: " + ipAddress;
     }
 
     private boolean isIPv6Address(String ipAddress) {
@@ -44,6 +53,11 @@ public class TelnetConfig {
     public boolean getStatus() {
         log.info("Getting connection status");
         return telnetClient.isConnected();
+    }
+
+    public String getAddress() {
+        log.info("Getting connection address");
+        return telnetClient.getRemoteAddress().getHostName() + ":" + telnetClient.getRemotePort();
     }
 
     public InputStream getInputStream() {
@@ -57,7 +71,7 @@ public class TelnetConfig {
     }
 
     public void disconnect() {
-        try{
+        try {
             telnetClient.disconnect();
             log.info("Disconnected from the server");
         } catch (IOException e) {

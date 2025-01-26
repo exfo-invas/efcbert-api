@@ -22,6 +22,10 @@ public class TelnetConfigUtils {
         return telnetConfig.getStatus();
     }
 
+    public String getAddress() {
+        return telnetConfig.getAddress();
+    }
+
     public InputStream getInputStream() {
         return telnetConfig.getInputStream();
     }
