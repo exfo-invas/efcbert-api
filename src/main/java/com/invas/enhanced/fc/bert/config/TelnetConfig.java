@@ -20,30 +20,26 @@ public class TelnetConfig {
         return telnetClient;
     }
 
-    public String getConnection(String ipAddress, int port) {
+    public boolean getConnection(String ipAddress, int port) {
         try {
-            if (isIPv6Address(ipAddress)) {
-                return connectIPv6(ipAddress, port);
-            } else {
-                return connectIPv4(ipAddress, port);
-            }
+            return isIPv6Address(ipAddress) ? connectIPv6(ipAddress, port) : connectIPv4(ipAddress, port);
         } catch (IOException e) {
-            return "Failed to connect to the server: " + ipAddress;
+            return false;
         }
     }
 
-    private String connectIPv6(String ipAddress, int port) throws IOException {
+    private boolean connectIPv6(String ipAddress, int port) throws IOException {
         System.setProperty("java.net.preferIPv6Addresses", "true");
         telnetClient = new TelnetClient();
         telnetClient.connect(ipAddress, port);
-        return "Connected to the server: " + ipAddress;
+        return getStatus();
     }
 
-    private String connectIPv4(String ipAddress, int port) throws IOException {
+    private boolean connectIPv4(String ipAddress, int port) throws IOException {
         System.setProperty("java.net.preferIPv6Addresses", "false");
         telnetClient = new TelnetClient();
         telnetClient.connect(ipAddress, port);
-        return "Connected to the server: " + ipAddress;
+        return getStatus();
     }
 
     private boolean isIPv6Address(String ipAddress) {
