@@ -1,7 +1,8 @@
-package com.invas.enhanced.fc.bert.controller;
+package com.invas.enhanced.fc.bert.controller.telnet;
 
-import com.invas.enhanced.fc.bert.model.ConnectionResponse;
-import com.invas.enhanced.fc.bert.service.TelnetService;
+import com.invas.enhanced.fc.bert.model.telnet.ConnectionResponse;
+import com.invas.enhanced.fc.bert.model.telnet.IPAddress;
+import com.invas.enhanced.fc.bert.service.telnet.TelnetService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,14 +21,14 @@ public class TelnetController {
         return ResponseEntity.ok(telnet);
     }
 
+    @GetMapping("/ip")
+    public IPAddress getIpAddress() {
+        return telnetService.getIPAddress();
+    }
+
     @GetMapping("/status")
     public String status() {
         return telnetService.status();
-    }
-
-    @PostMapping("/send")
-    public String sendCommand(@RequestBody String command) {
-        return telnetService.sendCommand(command);
     }
 
     @GetMapping("/disconnect")

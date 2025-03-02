@@ -1,4 +1,4 @@
-package com.invas.enhanced.fc.bert.model;
+package com.invas.enhanced.fc.bert.model.telnet;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

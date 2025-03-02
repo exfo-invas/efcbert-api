@@ -1,8 +1,8 @@
-package com.invas.enhanced.fc.bert.service;
+package com.invas.enhanced.fc.bert.service.telnet;
 
 import com.invas.enhanced.fc.bert.config.FetchIPAddress;
-import com.invas.enhanced.fc.bert.model.ConnectionResponse;
-import com.invas.enhanced.fc.bert.model.IPAddress;
+import com.invas.enhanced.fc.bert.model.telnet.ConnectionResponse;
+import com.invas.enhanced.fc.bert.model.telnet.IPAddress;
 import com.invas.enhanced.fc.bert.utils.TelnetConfigUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,15 +39,6 @@ public class TelnetServiceImpl implements TelnetService {
     public String status() {
         log.info(telnetConfigUtil.getAddress());
         return telnetConfigUtil.getStatus() ? "true" : "false";
-    }
-
-
-    public String sendCommand(String command) {
-        try {
-            return telnetConfigUtil.sendCommand(command);
-        } catch (Exception e) {
-            return "Failed to send command";
-        }
     }
 
 }

@@ -1,10 +1,9 @@
 package com.invas.enhanced.fc.bert.utils;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@RequiredArgsConstructor
 public class ScpiCommandConstants {
 
     private static final String LINS_SOURCE = "LINS1:SOUR:DATA:TEL:";
