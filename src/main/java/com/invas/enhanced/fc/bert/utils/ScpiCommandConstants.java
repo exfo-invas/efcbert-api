@@ -1,6 +1,5 @@
 package com.invas.enhanced.fc.bert.utils;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
