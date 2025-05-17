@@ -18,7 +18,7 @@ public class TelnetServiceImpl implements TelnetService {
 
     @Override
     public ConnectionResponse getConnection(String localIpaddress, int port) {
-        telnetConfigUtil.getConnection("localhost", 23);
+        telnetConfigUtil.getConnection(localIpaddress, port);
 
         return new ConnectionResponse(
                 telnetConfigUtil.getStatus(),
