@@ -12,7 +12,7 @@ public class ScpiCommandConstants {
     private static final String LASER_CONTROL_PREFIX = "LINS1:OUTP:TEL:LAS";
     private static final String OPT_PORT_FREQ = "OPT:PORT:FREQ";
     private static final String SDT = "SDT:";
-    private static final String TEST = "TEST:";
+    private static final String TEST = "TEST";
     private static final String OPT_PORT = "OPT:PORT:";
     private static final String ETH_PORT_TRAN = "ETH:PORT:TRAN";
     private static final String FIBER_PORT = "FIB:PORT:";
@@ -59,10 +59,10 @@ public class ScpiCommandConstants {
 
     public static String controller(String type) {
         String command = switch (type.toUpperCase()) {
-            case "OPEN" -> LINS_SOURCE + TEST + "TYPE FCBERT";
-            case "CLOSE" -> LINS_SOURCE + TEST + "CLOSE";
-            case "START" -> LINS_SOURCE + TEST + "ON";
-            case "STOP" -> LINS_SOURCE + TEST + "OFF";
+            //case "OPEN" -> LINS_SOURCE + TEST + " TYPE FCBERT";
+            case "CLOSE" -> LINS_SOURCE + TEST + " CLOSE";
+            case "START" -> LINS_SOURCE + TEST + " ON";
+            case "STOP" -> LINS_SOURCE + TEST + " OFF";
             case "RESET" -> LINS_SOURCE + "RES";
             default -> "";
         };
@@ -98,8 +98,8 @@ public class ScpiCommandConstants {
 
     public static String toolStatus(String type) {
         String command = switch (type.toUpperCase()) {
-            case "SOURCE?" -> LINS_SOURCE + FIBER_PORT + " WSO"; //Add ? or SOURCE input
-            case "DESTINATION?" -> LINS_SOURCE + FIBER_PORT + " WDES";//Add ? or DESTINATION input
+            case "SOURCE" -> LINS_SOURCE + FIBER_PORT + " WSO"; //Add ? or SOURCE input
+            case "DESTINATION" -> LINS_SOURCE + FIBER_PORT + " WDES";//Add ? or DESTINATION input
             case "FLOW-CONTROL" -> LINS_SOURCE + FIBER_PORT + "FCON:ENAB";//Add ? or ON or OFF
             case "CREDIT" -> LINS_SOURCE + FIBER_PORT + "AVA:BBCR";//Add ? or value
             case "LOGGING" -> LINS_SOURCE + FIBER_PORT + "LOG:STAT";//Add ? or ON or OFF
@@ -146,10 +146,11 @@ public class ScpiCommandConstants {
 
     public static String logging(String type) {
         String command = switch (type.toUpperCase()) {
+            case "TIME" -> LINS_FETCH + TEST + ":TIME?";
             case "LOG-LIST" -> LINS_FETCH + "LOGG:LIST?";
             case "LINK-STATUS" -> LINS_FETCH + "FIB:PORT:PLOG:STAT?";
-            case "TEST-TIME" -> LINS_FETCH + TEST + "STAR:TIME?";
-            case "STATUS" -> LINS_FETCH + TEST + "STAT?";
+            case "TEST-TIME" -> LINS_FETCH + TEST + ":STAR:TIME?";
+            case "STATUS" -> LINS_FETCH + TEST + ":STAT?";
             case "VERDICT" -> LINS_FETCH + "STAT:VERD?";
             default -> "";
         };

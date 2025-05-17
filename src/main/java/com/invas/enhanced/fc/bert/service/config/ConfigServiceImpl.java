@@ -15,6 +15,31 @@ public class ConfigServiceImpl implements ConfigService {
     private final TelnetConfigUtil telnetConfigUtil;
 
     @Override
+    public String testControl(boolean toggle) {
+        return telnetConfigUtil.sendCommand(ScpiCommandConstants.controller(toggle? "START" : "STOP"));
+    }
+
+    @Override
+    public String testReset() {
+        return telnetConfigUtil.sendCommand(ScpiCommandConstants.controller("RESET"));
+    }
+
+    @Override
+    public String testTime() {
+        return telnetConfigUtil.sendCommand(ScpiCommandConstants.controller("RESET"));
+    }
+
+    @Override
+    public String togglePSPLink(boolean toggle) {
+        return telnetConfigUtil.sendCommand(ScpiCommandConstants.pspLink(toggle ? "ENABLE" : "DISABLE"));
+    }
+
+    @Override
+    public String getPSPLink() {
+        return telnetConfigUtil.sendCommand(ScpiCommandConstants.pspLink("LINK"));
+    }
+
+    @Override
     public PhysicalStatus getPhysicalStatus() {
 
         String command = "BEGIN" + "\n" +

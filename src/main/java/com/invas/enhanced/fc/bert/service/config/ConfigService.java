@@ -16,4 +16,14 @@ public interface ConfigService {
     ToolStatus getToolStatus();
 
     String getPSPLinkStatus();
+
+    String testControl(boolean toggle);
+
+    String testReset();
+
+    String testTime();
+
+    String togglePSPLink(boolean toggle);
+
+    String getPSPLink();
 }

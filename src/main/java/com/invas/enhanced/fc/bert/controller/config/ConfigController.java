@@ -29,4 +29,29 @@ public class ConfigController {
     public String getLaser(@PathVariable boolean toggle) {
         return configService.laserControl(toggle);
     }
+
+    @GetMapping("/test/{toggle}")
+    public String toogleTest(@PathVariable boolean toggle) {
+        return configService.testControl(toggle);
+    }
+
+    @GetMapping("/test/reset")
+    public String testReset() {
+        return configService.testReset();
+    }
+
+    @GetMapping("/test/time")
+    public String testTime() {
+        return configService.testTime();
+    }
+
+    @GetMapping("/psp/{toggle}")
+    public String getPSPLinkStatus(@PathVariable boolean toggle) {
+        return configService.togglePSPLink(toggle);
+    }
+
+    @GetMapping("/psp/link")
+    public String getPSPLink() {
+        return configService.getPSPLink();
+    }
 }
