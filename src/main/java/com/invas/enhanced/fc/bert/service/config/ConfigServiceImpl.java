@@ -6,8 +6,10 @@ import com.invas.enhanced.fc.bert.model.config.ToolStatus;
 import com.invas.enhanced.fc.bert.utils.ScpiCommandConstants;
 import com.invas.enhanced.fc.bert.utils.TelnetConfigUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ConfigServiceImpl implements ConfigService {
@@ -72,6 +74,15 @@ public class ConfigServiceImpl implements ConfigService {
     }
 
     public ToolStatus getToolStatus() {
+
+        String toolStatus = ScpiCommandConstants.fcbertConfiguration("COUPLED") + "\n" +
+                ScpiCommandConstants.fcbertConfiguration("PATTERN") + "\n" +
+                ScpiCommandConstants.fcbertConfiguration("FRAME-RATE") + "\n" +
+                ScpiCommandConstants.fcbertConfiguration("STREAM-RATE");
+
+        log.info("Begin: {}", telnetConfigUtil.sendCommand("BEGIN"));
+        log.info("toolStatus response: {}",telnetConfigUtil.sendCommand(toolStatus));
+
 
         return new ToolStatus(
                 telnetConfigUtil.sendCommand(ScpiCommandConstants.fcbertConfiguration("COUPLED")),
