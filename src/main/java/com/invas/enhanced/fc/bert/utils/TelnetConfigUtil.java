@@ -2,12 +2,13 @@ package com.invas.enhanced.fc.bert.utils;
 
 import com.invas.enhanced.fc.bert.config.TelnetConfig;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Scanner;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TelnetConfigUtil {
@@ -37,20 +38,25 @@ public class TelnetConfigUtil {
     }
 
     public String sendCommand(String command) {
+        log.info("TelnetConfigUtil sendCommand {}", command);
         if (getStatus()) {
             try {
 
                 writer.println(command);
                 writer.flush();
                 Thread.sleep(500);
+                log.info("Writer flush check error {}", writer.checkError());
 
                 long startTime = System.currentTimeMillis();
                 StringBuilder response = new StringBuilder();
                 while (reader.hasNextLine() && (System.currentTimeMillis() - startTime <= RESPONSE_TIMEOUT)) {
+                    int i = 0;
+                    log.info("Reader line no.{}, : {}", ++i, reader.nextLine());
                     response.append(reader.nextLine()).append("\n");
                 }
                 return response.toString();
             } catch (Exception e) {
+                log.error("TelnetConfigUtil {}", e.getMessage(), e);
                 return "Failed to send command";
             }
         } else {
