@@ -42,25 +42,14 @@ public class ConfigServiceImpl implements ConfigService {
     @Override
     public PhysicalStatus getPhysicalStatus() {
 
-        String command = "BEGIN" + "\n" +
-                ScpiCommandConstants.laserCntrl("STAT") + "\n" +
-                ScpiCommandConstants.interfaceType("VALUE") + "\n" +
-                ScpiCommandConstants.physicalPort("STATUS") + "\n" +
-                ScpiCommandConstants.logging("LINK-STATUS") + "\n" +
-                ScpiCommandConstants.consoleOuput("TX") + "\n" +
-                ScpiCommandConstants.consoleOuput("RX") + "\n" +
-                "END";
-
-        String[] response = telnetConfigUtil.sendCommand(command).split("\n");
-
         //Execute command to get status
         return new PhysicalStatus(
-                response[1],
-                response[2],
-                response[3],
-                response[4],
-                response[5],
-                response[6]
+                telnetConfigUtil.sendCommand(ScpiCommandConstants.laserCntrl("STAT")),
+                telnetConfigUtil.sendCommand(ScpiCommandConstants.interfaceType("VALUE")),
+                telnetConfigUtil.sendCommand(ScpiCommandConstants.physicalPort("STATUS")),
+                telnetConfigUtil.sendCommand(ScpiCommandConstants.logging("LINK-STATUS")),
+                telnetConfigUtil.sendCommand(ScpiCommandConstants.consoleOuput("TX")),
+                telnetConfigUtil.sendCommand(ScpiCommandConstants.consoleOuput("RX"))
         );
     }
 
@@ -69,47 +58,26 @@ public class ConfigServiceImpl implements ConfigService {
     }
 
     public PortStatus getPortStatus() {
-        String command = "BEGIN" + "\n" +
-                ScpiCommandConstants.toolStatus("SOURCE") + "?" + "\n" +
-                ScpiCommandConstants.toolStatus("DESTINATION") + "?" + "\n" +
-                ScpiCommandConstants.toolStatus("FLOW-CONTROL") + "?" + "\n" +
-                ScpiCommandConstants.toolStatus("CREDIT") + "?" + "\n" +
-                ScpiCommandConstants.toolStatus("LOGGING") + "?" + "\n" +
-                ScpiCommandConstants.toolStatus("TOPOLOGY") + "\n" +
-                ScpiCommandConstants.toolStatus("FABRIC-STATUS") + "\n" +
-                ScpiCommandConstants.toolStatus("PORT-STATUS") + "\n" +
-                "END";
-
-        String[] response = telnetConfigUtil.sendCommand(command).split("\n");
-
         //Execute command to get status
         return new PortStatus(
-                response[1],
-                response[2],
-                response[3],
-                response[4],
-                response[5],
-                response[6],
-                response[7],
-                response[8]
+                telnetConfigUtil.sendCommand(ScpiCommandConstants.toolStatus("SOURCE")),
+                telnetConfigUtil.sendCommand(ScpiCommandConstants.toolStatus("DESTINATION")),
+                telnetConfigUtil.sendCommand(ScpiCommandConstants.toolStatus("FLOW-CONTROL")),
+                telnetConfigUtil.sendCommand(ScpiCommandConstants.toolStatus("CREDIT")),
+                telnetConfigUtil.sendCommand(ScpiCommandConstants.toolStatus("LOGGING")),
+                telnetConfigUtil.sendCommand(ScpiCommandConstants.toolStatus("TOPOLOGY")),
+                telnetConfigUtil.sendCommand(ScpiCommandConstants.toolStatus("FABRIC-STATUS")),
+                telnetConfigUtil.sendCommand(ScpiCommandConstants.toolStatus("PORT-STATUS"))
         );
     }
 
     public ToolStatus getToolStatus() {
-        String command = "BEGIN" + "\n" +
-                ScpiCommandConstants.fcbertConfiguration("COUPLED") + "?" + "\n" +
-                ScpiCommandConstants.fcbertConfiguration("PATTERN") + "\n" +
-                ScpiCommandConstants.fcbertConfiguration("FRAME-RATE") + "?" + "\n" +
-                ScpiCommandConstants.fcbertConfiguration("STREAM-RATE") + "?" + "\n" +
-                "END";
-
-        String[] response = telnetConfigUtil.sendCommand(command).split("\n");
 
         return new ToolStatus(
-                response[1],
-                response[2],
-                response[3],
-                response[4]
+                telnetConfigUtil.sendCommand(ScpiCommandConstants.fcbertConfiguration("COUPLED")),
+                telnetConfigUtil.sendCommand(ScpiCommandConstants.fcbertConfiguration("PATTERN")),
+                telnetConfigUtil.sendCommand(ScpiCommandConstants.fcbertConfiguration("FRAME-RATE")),
+                telnetConfigUtil.sendCommand(ScpiCommandConstants.fcbertConfiguration("STREAM-RATE"))
         );
     }
 
