@@ -17,7 +17,7 @@ public class TelnetConfigUtil {
 
     private PrintWriter writer;
     private Scanner reader;
-    private static final int RESPONSE_TIMEOUT = 10000;
+    private static final int RESPONSE_TIMEOUT = 5000;
 
     public boolean getConnection(String localIpaddress, int port) {
 
@@ -51,7 +51,8 @@ public class TelnetConfigUtil {
 
                 long startTime = System.currentTimeMillis();
                 StringBuilder response = new StringBuilder();
-                while (reader.hasNextLine() ) { //&& (System.currentTimeMillis() - startTime <= RESPONSE_TIMEOUT)
+                log.info("TelnetConfigUtil reader {}", reader);
+                while (reader.hasNextLine() && (System.currentTimeMillis() - startTime <= RESPONSE_TIMEOUT) ) {
                     int i = 0;
                     log.info("Reader line no.{}, : {}", ++i, reader.nextLine());
                     response.append(reader.nextLine()).append("\n");
