@@ -32,6 +32,7 @@ public class TelnetConfig {
         System.setProperty("java.net.preferIPv6Addresses", "true");
         telnetClient = new TelnetClient();
         telnetClient.connect(ipAddress, port);
+        log.info("TelnetConfig Ipv6 Connected to {}:{}", ipAddress, port);
         return getStatus();
     }
 
@@ -39,6 +40,7 @@ public class TelnetConfig {
         System.setProperty("java.net.preferIPv6Addresses", "false");
         telnetClient = new TelnetClient();
         telnetClient.connect(ipAddress, port);
+        log.info("TelnetConfig Ipv4 Connected to {}:{}", ipAddress, port);
         return getStatus();
     }
 
