@@ -24,6 +24,8 @@ public class TelnetConfigUtil {
         if (telnetConfig.getConnection(localIpaddress, port)) {
             writer = new PrintWriter(telnetConfig.getOutputStream(), true);
             reader = new Scanner(telnetConfig.getInputStream());
+            log.info("TelnetConfigUtil Connected to {}:{}", localIpaddress, port);
+            log.info("TelnetConfigUtil writer: {} \n reader: {}", writer.checkError(), reader);
             return true;
         }
         return false;
