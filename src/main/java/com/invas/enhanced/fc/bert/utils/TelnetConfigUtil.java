@@ -17,7 +17,6 @@ public class TelnetConfigUtil {
 
     private PrintWriter writer;
     private Scanner reader;
-    private static final int RESPONSE_TIMEOUT = 5000;
 
     public boolean getConnection(String localIpaddress, int port) {
 
@@ -41,30 +40,32 @@ public class TelnetConfigUtil {
 
     public String sendCommand(String command) {
         log.info("TelnetConfigUtil sendCommand {}", command);
-        if (getStatus()) {
-            try {
-
-                writer.println(command);
-                writer.flush();
-                Thread.sleep(500);
-                log.info("Writer flush check error {}", writer.checkError());
-
-                long startTime = System.currentTimeMillis();
-                StringBuilder response = new StringBuilder();
-                log.info("TelnetConfigUtil reader {}", reader);
-                while (reader.hasNextLine() && (System.currentTimeMillis() - startTime <= RESPONSE_TIMEOUT) ) {
-                    int i = 0;
-                    log.info("Reader line no.{}, : {}", ++i, reader.nextLine());
-                    response.append(reader.nextLine()).append("\n");
-                }
-                return response.toString();
-            } catch (Exception e) {
-                log.error("TelnetConfigUtil {}", e.getMessage(), e);
-                return "Failed to send command";
-            }
-        } else {
+        if (!getStatus()) {
             return "Connection is not established";
         }
+
+        StringBuilder response = new StringBuilder();
+        try {
+            writer.println(command);
+            writer.flush();
+            Thread.sleep(500);
+            log.info("Writer flush check error {}", writer.checkError());
+            log.info("TelnetConfigUtil reader {}", reader);
+            String line;
+            do {
+                int i = 0;
+                line = reader.nextLine();
+                log.info("Reader line no.{}, : {}", ++i, line);
+                response.append(line).append("\n");
+
+            } while (!line.contains("Ready") && line.contains("this operation may take few minutes")
+                    && line.contains("trying to connect"));
+        } catch (Exception e) {
+            log.error("TelnetConfigUtil {}", e.getMessage(), e);
+            return "Failed to send command";
+        }
+        log.info("TelnetConfigUtil sendCommand response: {}", response);
+        return response.toString();
     }
 
     public void disconnect() {
