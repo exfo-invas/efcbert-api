@@ -40,6 +40,7 @@ public class TelnetConfigUtil {
 
         String condition1 = "this operation may take few minutes";
         String condition2 = "Trying to connect";
+        String ready = "ready";
 
         log.info("TelnetConfigUtil sendCommand {}", command);
         if (!getStatus()) {
@@ -52,22 +53,33 @@ public class TelnetConfigUtil {
             writer.flush();
             Thread.sleep(500);
             log.info("Writer flush check error {}", writer.checkError());
-            String line;
+
+            if (reader == null) {
+                log.error("Reader is not initialized");
+                return "Reader is not initialized";
+            }
+
             log.info("************COMMAND BEGIN**************");
-            do {
-                line = reader.nextLine();
+            while (reader.hasNextLine()) {
+                String line = reader.nextLine();
+                if (line == null || line.isBlank()) {
+                    continue;
+                }
                 log.info("Reader : {}", line);
                 response.append(line).append("\n");
                 log.info("TelnetConfigUtil response next line: {}", reader.hasNextLine());
-                if (line.contains("Ready")) {
+                if (line.toLowerCase().contains(ready.toLowerCase())) {
                     log.info("TelnetConfigUtil ready final line: {}", line);
                     break;
                 }
-            } while (line.toLowerCase().contains(condition1.toLowerCase()) || line.toLowerCase().contains(condition2.toLowerCase()));
+                if (!(line.toLowerCase().contains(condition1.toLowerCase()) || line.toLowerCase().contains(condition2.toLowerCase()))) {
+                    break;
+                }
+            }
 
             log.info("************COMMAND END**************");
         } catch (Exception e) {
-            log.error("TelnetConfigUtil {}", e.getMessage(), e);
+            log.error("TelnetConfigUtil Error{}", e.getMessage(), e.getCause());
             return "Failed to send command";
         }
         log.info("TelnetConfigUtil sendCommand response: {}", response);
