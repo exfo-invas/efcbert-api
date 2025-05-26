@@ -18,16 +18,14 @@ public class TelnetConfigUtil {
     private PrintWriter writer;
     private Scanner reader;
 
-    public boolean getConnection(String localIpaddress, int port) {
+    public void getConnection(String localIpaddress, int port) {
 
         if (telnetConfig.getConnection(localIpaddress, port)) {
             writer = new PrintWriter(telnetConfig.getOutputStream(), true);
             reader = new Scanner(telnetConfig.getInputStream());
             log.info("TelnetConfigUtil Connected to {}:{}", localIpaddress, port);
             log.info("TelnetConfigUtil writer: {} \n reader: {}", writer.checkError(), reader);
-            return true;
         }
-        return false;
     }
 
     public boolean getStatus() {
@@ -52,14 +50,15 @@ public class TelnetConfigUtil {
             log.info("Writer flush check error {}", writer.checkError());
             log.info("TelnetConfigUtil reader {}", reader);
             String line;
+            log.info("************COMMAND BEGIN**************");
             do {
-                int i = 0;
                 line = reader.nextLine();
-                log.info("Reader line no.{}, : {}", ++i, line);
+                log.info("Reader : {}", line);
                 response.append(line).append("\n");
 
             } while (!line.contains("Ready") && line.contains("this operation may take few minutes")
                     && line.contains("trying to connect"));
+            log.info("************COMMAND END**************");
         } catch (Exception e) {
             log.error("TelnetConfigUtil {}", e.getMessage(), e);
             return "Failed to send command";
