@@ -63,7 +63,7 @@ public class TelnetConfigUtil {
                     log.info("TelnetConfigUtil ready final line: {}", line);
                     break;
                 }
-            } while (line.toLowerCase().contains(condition1.toLowerCase()) && line.toLowerCase().contains(condition2.toLowerCase()));
+            } while (line.toLowerCase().contains(condition1.toLowerCase()) || line.toLowerCase().contains(condition2.toLowerCase()));
 
             log.info("************COMMAND END**************");
         } catch (Exception e) {
