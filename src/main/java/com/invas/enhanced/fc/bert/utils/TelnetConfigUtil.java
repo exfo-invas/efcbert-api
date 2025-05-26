@@ -37,6 +37,10 @@ public class TelnetConfigUtil {
     }
 
     public String sendCommand(String command) {
+
+        String condition1 = "this operation may take few minutes";
+        String condition2 = "Trying to connect";
+
         log.info("TelnetConfigUtil sendCommand {}", command);
         if (!getStatus()) {
             return "Connection is not established";
@@ -48,7 +52,6 @@ public class TelnetConfigUtil {
             writer.flush();
             Thread.sleep(500);
             log.info("Writer flush check error {}", writer.checkError());
-            log.info("TelnetConfigUtil reader {}", reader);
             String line;
             log.info("************COMMAND BEGIN**************");
             do {
@@ -60,7 +63,7 @@ public class TelnetConfigUtil {
                     log.info("TelnetConfigUtil ready final line: {}", line);
                     break;
                 }
-            } while (line.contains("this operation may take few minutes") && line.contains("trying to connect"));
+            } while (line.toLowerCase().contains(condition1.toLowerCase()) && line.toLowerCase().contains(condition2.toLowerCase()));
 
             log.info("************COMMAND END**************");
         } catch (Exception e) {
