@@ -55,9 +55,13 @@ public class TelnetConfigUtil {
                 line = reader.nextLine();
                 log.info("Reader : {}", line);
                 response.append(line).append("\n");
+                log.info("TelnetConfigUtil response next line: {}", reader.hasNextLine());
+                if (line.contains("Ready")) {
+                    log.info("TelnetConfigUtil ready final line: {}", line);
+                    break;
+                }
+            } while (line.contains("this operation may take few minutes") && line.contains("trying to connect"));
 
-            } while (!line.contains("Ready") && line.contains("this operation may take few minutes")
-                    && line.contains("trying to connect"));
             log.info("************COMMAND END**************");
         } catch (Exception e) {
             log.error("TelnetConfigUtil {}", e.getMessage(), e);
