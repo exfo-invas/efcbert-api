@@ -74,20 +74,10 @@ public class ConfigServiceImpl implements ConfigService {
     }
 
     public ToolStatus getToolStatus() {
-
-        String toolStatus = ScpiCommandConstants.fcbertConfiguration("COUPLED") + "\n" +
-                ScpiCommandConstants.fcbertConfiguration("PATTERN") + "\n" +
-                ScpiCommandConstants.fcbertConfiguration("FRAME-RATE") + "\n" +
-                ScpiCommandConstants.fcbertConfiguration("STREAM-RATE");
-
-        log.info("Begin: {}", telnetConfigUtil.sendCommand("BEGIN"));
-        log.info("toolStatus response: {}",telnetConfigUtil.sendCommand(toolStatus));
-
-
         return new ToolStatus(
                 telnetConfigUtil.sendCommand(ScpiCommandConstants.fcbertConfiguration("COUPLED")),
                 telnetConfigUtil.sendCommand(ScpiCommandConstants.fcbertConfiguration("PATTERN")),
-                telnetConfigUtil.sendCommand(ScpiCommandConstants.fcbertConfiguration("FRAME-RATE")),
+                telnetConfigUtil.sendCommand(ScpiCommandConstants.fcbertConfiguration("FRAME-SIZE")),
                 telnetConfigUtil.sendCommand(ScpiCommandConstants.fcbertConfiguration("STREAM-RATE"))
         );
     }
