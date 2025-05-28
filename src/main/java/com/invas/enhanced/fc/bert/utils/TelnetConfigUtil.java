@@ -15,17 +15,10 @@ public class TelnetConfigUtil {
 
     private final TelnetConfig telnetConfig;
 
-    private PrintWriter writer;
-    private Scanner reader;
-
     public void getConnection(String localIpaddress, int port) {
 
-        if (telnetConfig.getConnection(localIpaddress, port)) {
-            writer = new PrintWriter(telnetConfig.getOutputStream(), true);
-            reader = new Scanner(telnetConfig.getInputStream());
-            log.info("TelnetConfigUtil Connected to {}:{}", localIpaddress, port);
-            log.info("TelnetConfigUtil writer: {} \n reader: {}", writer.checkError(), reader);
-        }
+        telnetConfig.getConnection(localIpaddress, port);
+        log.info("TelnetConfigUtil Connected to {}:{}", localIpaddress, port);
     }
 
     public boolean getStatus() {
@@ -38,8 +31,9 @@ public class TelnetConfigUtil {
 
     public String sendCommand(String command) {
 
-        String condition1 = "this operation may take few minutes";
-        String condition2 = "Trying to connect";
+        PrintWriter writer = new PrintWriter(telnetConfig.getOutputStream(), true);
+        Scanner reader = new Scanner(telnetConfig.getInputStream());
+
         String ready = "ready";
 
         log.info("TelnetConfigUtil sendCommand {}", command);
@@ -54,11 +48,6 @@ public class TelnetConfigUtil {
             Thread.sleep(500);
             log.info("Writer flush check error {}", writer.checkError());
 
-            if (reader == null) {
-                log.error("Reader is not initialized");
-                return "Reader is not initialized";
-            }
-
             log.info("************COMMAND BEGIN**************");
             while (reader.hasNextLine()) {
                 String line = reader.nextLine();
@@ -69,20 +58,18 @@ public class TelnetConfigUtil {
                 response.append(line).append("\n");
                 log.info("TelnetConfigUtil response next line: {}", reader.hasNextLine());
                 if (line.toLowerCase().contains(ready.toLowerCase())) {
-                    log.info("TelnetConfigUtil ready final line: {}", line);
-                    break;
-                }
-                if (!(line.toLowerCase().contains(condition1.toLowerCase()) || line.toLowerCase().contains(condition2.toLowerCase()))) {
+                    log.info("TelnetConfigUtil has ready -> final line: {}", line);
                     break;
                 }
             }
-
             log.info("************COMMAND END**************");
         } catch (Exception e) {
             log.error("TelnetConfigUtil Error{}", e.getMessage(), e.getCause());
             return "Failed to send command";
         }
         log.info("TelnetConfigUtil sendCommand response: {}", response);
+        writer.close();
+        reader.close();
         return response.toString();
     }
 
