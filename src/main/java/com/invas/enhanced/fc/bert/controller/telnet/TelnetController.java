@@ -4,9 +4,10 @@ import com.invas.enhanced.fc.bert.model.telnet.ConnectionResponse;
 import com.invas.enhanced.fc.bert.model.telnet.IPAddress;
 import com.invas.enhanced.fc.bert.service.telnet.TelnetService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/telnet")
 @RequiredArgsConstructor
@@ -15,10 +16,10 @@ public class TelnetController {
     private final TelnetService telnetService;
 
     @GetMapping("/connect/{ip}/{port}")
-    public ResponseEntity<ConnectionResponse> openConnection(@PathVariable String ip, @PathVariable int port) {
+    public ConnectionResponse openConnection(@PathVariable String ip, @PathVariable int port) {
         ConnectionResponse telnet = telnetService.getConnection(ip, port);
-        System.out.println(telnet);
-        return ResponseEntity.ok(telnet);
+        log.info("TelnetController get connection {}", telnet);
+        return telnet;
     }
 
     @GetMapping("/ip")

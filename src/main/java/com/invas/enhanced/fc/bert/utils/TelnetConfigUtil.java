@@ -60,7 +60,6 @@ public class TelnetConfigUtil {
                 }
                 log.info("Reader : {}", line);
                 response.append(line).append("\n");
-                log.info("TelnetConfigUtil response next line: {}", reader.hasNextLine());
                 if (line.toLowerCase().contains(ready.toLowerCase())) {
                     log.info("TelnetConfigUtil has ready -> final line: {}", line);
                     break;
