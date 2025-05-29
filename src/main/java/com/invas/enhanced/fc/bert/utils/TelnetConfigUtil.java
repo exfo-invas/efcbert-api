@@ -5,8 +5,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.util.Scanner;
 
 @Slf4j
 @Service
@@ -16,13 +17,14 @@ public class TelnetConfigUtil {
     private final TelnetConfig telnetConfig;
 
     private PrintWriter writer;
-    private Scanner reader;
+    /*private Scanner reader;*/
+    private BufferedReader reader;
 
     public void getConnection(String localIpaddress, int port) {
 
         if (telnetConfig.getConnection(localIpaddress, port)) {
             writer = new PrintWriter(telnetConfig.getOutputStream(), true);
-            reader = new Scanner(telnetConfig.getInputStream());
+            reader = new BufferedReader(new InputStreamReader(telnetConfig.getInputStream()));
             log.info("TelnetConfigUtil Connected to {}:{}", localIpaddress, port);
             log.info("TelnetConfigUtil writer: {} \n reader: {}", writer.checkError(), reader);
         }
@@ -38,7 +40,7 @@ public class TelnetConfigUtil {
 
     public String sendCommand(String command) {
 
-        String ready = "ready";
+        //String ready = "ready";
 
         log.info("TelnetConfigUtil sendCommand {}", command);
         if (!getStatus()) {
@@ -53,17 +55,17 @@ public class TelnetConfigUtil {
             log.info("Writer flush check error {}", writer.checkError());
 
             log.info("************COMMAND BEGIN**************");
-            while (reader.hasNextLine()) {
-                String line = reader.nextLine();
-                if (line == null || line.isBlank()) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.isBlank()) {
                     continue;
                 }
                 log.info("Reader : {}", line);
                 response.append(line).append("\n");
-                if (line.toLowerCase().contains(ready.toLowerCase())) {
+                /*if (line.toLowerCase().contains(ready.toLowerCase())) {
                     log.info("TelnetConfigUtil has ready -> final line: {}", line);
                     break;
-                }
+                }*/
             }
             log.info("************COMMAND END**************");
         } catch (Exception e) {
