@@ -15,10 +15,17 @@ public class TelnetConfigUtil {
 
     private final TelnetConfig telnetConfig;
 
+    private PrintWriter writer;
+    private Scanner reader;
+
     public void getConnection(String localIpaddress, int port) {
 
-        telnetConfig.getConnection(localIpaddress, port);
-        log.info("TelnetConfigUtil Connected to {}:{}", localIpaddress, port);
+        if (telnetConfig.getConnection(localIpaddress, port)) {
+            writer = new PrintWriter(telnetConfig.getOutputStream(), true);
+            reader = new Scanner(telnetConfig.getInputStream());
+            log.info("TelnetConfigUtil Connected to {}:{}", localIpaddress, port);
+            log.info("TelnetConfigUtil writer: {} \n reader: {}", writer.checkError(), reader);
+        }
     }
 
     public boolean getStatus() {
@@ -30,9 +37,6 @@ public class TelnetConfigUtil {
     }
 
     public String sendCommand(String command) {
-
-        PrintWriter writer = new PrintWriter(telnetConfig.getOutputStream(), true);
-        Scanner reader = new Scanner(telnetConfig.getInputStream());
 
         String ready = "ready";
 
@@ -68,8 +72,6 @@ public class TelnetConfigUtil {
             return "Failed to send command";
         }
         log.info("TelnetConfigUtil sendCommand response: {}", response);
-        writer.close();
-        reader.close();
         return response.toString();
     }
 
