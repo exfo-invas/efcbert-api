@@ -7,7 +7,6 @@ import com.invas.enhanced.fc.bert.utils.ScpiCommandConstants;
 import com.invas.enhanced.fc.bert.utils.TelnetConfigUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.net.telnet.TelnetClient;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service;
 public class ConfigServiceImpl implements ConfigService {
 
     private final TelnetConfigUtil telnetConfigUtil;
-    private final TelnetClient telnetClient;
 
     @Override
     public String testControl(boolean toggle) {
@@ -45,8 +43,6 @@ public class ConfigServiceImpl implements ConfigService {
 
     @Override
     public PhysicalStatus getPhysicalStatus() {
-
-        log.info("Address of telnetClient {}", telnetClient.getRemoteAddress());
 
         //Execute command to get status
         return new PhysicalStatus(
