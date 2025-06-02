@@ -36,12 +36,12 @@ public class FetchIPAddress {
                 while (addresses.hasMoreElements()) {
                     InetAddress address = addresses.nextElement();
 
-                    if (address.isLinkLocalAddress() || address.isAnyLocalAddress() || address.isLoopbackAddress()) {
+                    if (address.isAnyLocalAddress() || address.isLoopbackAddress()) {
                         continue;
                     }
 
                     // Print IPv4 and IPv6 addresses
-                    if (address.getHostAddress().contains(":")) {
+                    if (address instanceof java.net.Inet6Address) {
                         ipv6.add(address.getHostAddress());
                         System.out.println("IPv6 Address: " + address.getHostAddress());
                     } else {
