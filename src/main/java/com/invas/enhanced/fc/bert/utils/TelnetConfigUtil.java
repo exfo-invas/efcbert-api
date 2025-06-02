@@ -40,7 +40,8 @@ public class TelnetConfigUtil {
 
     public String sendCommand(String command) {
 
-        //String ready = "ready";
+        String ready = "ready";
+        String moduleIssue = "Module not present on slot 1";
 
         log.info("TelnetConfigUtil sendCommand {}", command);
         if (!getStatus()) {
@@ -62,10 +63,10 @@ public class TelnetConfigUtil {
                 }
                 log.info("Reader : {}", line);
                 response.append(line).append("\n");
-                /*if (line.toLowerCase().contains(ready.toLowerCase())) {
+                if (line.toLowerCase().contains(ready.toLowerCase()) ||  line.toLowerCase().contains(moduleIssue.toLowerCase())) {
                     log.info("TelnetConfigUtil has ready -> final line: {}", line);
                     break;
-                }*/
+                }
             }
             log.info("************COMMAND END**************");
         } catch (Exception e) {
