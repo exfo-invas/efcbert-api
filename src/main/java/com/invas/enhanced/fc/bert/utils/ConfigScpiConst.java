@@ -3,7 +3,7 @@ package com.invas.enhanced.fc.bert.utils;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ScpiCommandConstants {
+public class ConfigScpiConst {
 
 
     private static final String LINS_SOURCE = "LINS1:SOUR:DATA:TEL:";
@@ -17,7 +17,7 @@ public class ScpiCommandConstants {
     private static final String ETH_PORT_TRAN = "ETH:PORT:TRAN";
     private static final String FIBER_PORT = "FIB:PORT:";
 
-    public ScpiCommandConstants() {
+    public ConfigScpiConst() {
     }
 
     public static String laserCntrl(String type) {
@@ -109,6 +109,29 @@ public class ScpiCommandConstants {
             default -> "";
         };
         log.info("Physical command: {}", command);
+        return command;
+    }
+
+    public static String loginControl(String type) {
+        String command = switch (type.toUpperCase()) {
+            case "ON" -> LINS_SOURCE + FIBER_PORT + "LOG:STAT ON";
+            case "OFF" -> LINS_SOURCE + FIBER_PORT + "LOG:STAT OFF";
+            case "STATUS" -> LINS_SOURCE + FIBER_PORT + "LOG:STAT?";
+            default -> "";
+        };
+        log.info("Login Source commands: {}", command);
+        return command;
+    }
+
+    public static String bufferCredit(String type) {
+        String ADV_BBCR = "ADV:BBCR:";
+        String command = switch (type.toUpperCase()) {
+            case "SET" -> LINS_SOURCE + FIBER_PORT + ADV_BBCR + " "; //add value eg: "LINS1:SOUR:DATA:TEL:FIB:PORT:ADV:BBCR 60"
+            case "MAX" -> LINS_SOURCE + FIBER_PORT + ADV_BBCR + " MAX";
+            case "MIX" -> LINS_SOURCE + FIBER_PORT + ADV_BBCR +" MIN";
+            default -> "";
+        };
+        log.info("PSP Source commands: {}", command);
         return command;
     }
 
