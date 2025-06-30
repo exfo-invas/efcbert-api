@@ -1,10 +1,11 @@
 package com.invas.enhanced.fc.bert.service.config;
 
+import com.invas.enhanced.fc.bert.config.TelnetConfig;
 import com.invas.enhanced.fc.bert.model.config.PortStatus;
 import com.invas.enhanced.fc.bert.model.config.PhysicalStatus;
 import com.invas.enhanced.fc.bert.model.config.ToolStatus;
 import com.invas.enhanced.fc.bert.utils.ConfigScpiConst;
-import com.invas.enhanced.fc.bert.utils.TelnetConfigUtil;
+import com.invas.enhanced.fc.bert.utils.ScpiTelnetHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,31 +15,33 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ConfigServiceImpl implements ConfigService {
 
-    private final TelnetConfigUtil telnetConfigUtil;
+    private final TelnetConfig telnetConfig;
+
+    ScpiTelnetHandler scpiTelnetHandler = new ScpiTelnetHandler(telnetConfig);
 
     @Override
     public String testControl(boolean toggle) {
-        return telnetConfigUtil.sendCommand(ConfigScpiConst.controller(toggle? "START" : "STOP"));
+        return scpiTelnetHandler.sendCommand(ConfigScpiConst.controller(toggle? "START" : "STOP"));
     }
 
     @Override
     public String testReset() {
-        return telnetConfigUtil.sendCommand(ConfigScpiConst.controller("RESET"));
+        return scpiTelnetHandler.sendCommand(ConfigScpiConst.controller("RESET"));
     }
 
     @Override
     public String testTime() {
-        return telnetConfigUtil.sendCommand(ConfigScpiConst.controller("RESET"));
+        return scpiTelnetHandler.sendCommand(ConfigScpiConst.controller("RESET"));
     }
 
     @Override
     public String togglePSPLink(boolean toggle) {
-        return telnetConfigUtil.sendCommand(ConfigScpiConst.pspLink(toggle ? "ENABLE" : "DISABLE"));
+        return scpiTelnetHandler.sendCommand(ConfigScpiConst.pspLink(toggle ? "ENABLE" : "DISABLE"));
     }
 
     @Override
     public String getPSPLink() {
-        return telnetConfigUtil.sendCommand(ConfigScpiConst.pspLink("LINK"));
+        return scpiTelnetHandler.sendCommand(ConfigScpiConst.pspLink("LINK"));
     }
 
     @Override
@@ -46,43 +49,43 @@ public class ConfigServiceImpl implements ConfigService {
 
         //Execute command to get status
         return new PhysicalStatus(
-                telnetConfigUtil.sendCommand(ConfigScpiConst.laserCntrl("STAT")),
-                telnetConfigUtil.sendCommand(ConfigScpiConst.interfaceType("VALUE")),
-                telnetConfigUtil.sendCommand(ConfigScpiConst.physicalPort("STATUS")),
-                telnetConfigUtil.sendCommand(ConfigScpiConst.logging("LINK-STATUS")),
-                telnetConfigUtil.sendCommand(ConfigScpiConst.consoleOuput("TX")),
-                telnetConfigUtil.sendCommand(ConfigScpiConst.consoleOuput("RX"))
+                scpiTelnetHandler.sendCommand(ConfigScpiConst.laserCntrl("STAT")),
+                scpiTelnetHandler.sendCommand(ConfigScpiConst.interfaceType("VALUE")),
+                scpiTelnetHandler.sendCommand(ConfigScpiConst.physicalPort("STATUS")),
+                scpiTelnetHandler.sendCommand(ConfigScpiConst.logging("LINK-STATUS")),
+                scpiTelnetHandler.sendCommand(ConfigScpiConst.consoleOuput("TX")),
+                scpiTelnetHandler.sendCommand(ConfigScpiConst.consoleOuput("RX"))
         );
     }
 
     public String laserControl(boolean type) {
-        return telnetConfigUtil.sendCommand(ConfigScpiConst.laserCntrl(type ? "ON" : "OFF"));
+        return scpiTelnetHandler.sendCommand(ConfigScpiConst.laserCntrl(type ? "ON" : "OFF"));
     }
 
     public PortStatus getPortStatus() {
         //Execute command to get status
         return new PortStatus(
-                telnetConfigUtil.sendCommand(ConfigScpiConst.toolStatus("SOURCE")),
-                telnetConfigUtil.sendCommand(ConfigScpiConst.toolStatus("DESTINATION")),
-                telnetConfigUtil.sendCommand(ConfigScpiConst.toolStatus("FLOW-CONTROL")),
-                telnetConfigUtil.sendCommand(ConfigScpiConst.toolStatus("CREDIT")),
-                telnetConfigUtil.sendCommand(ConfigScpiConst.toolStatus("LOGGING")),
-                telnetConfigUtil.sendCommand(ConfigScpiConst.toolStatus("TOPOLOGY")),
-                telnetConfigUtil.sendCommand(ConfigScpiConst.toolStatus("FABRIC-STATUS")),
-                telnetConfigUtil.sendCommand(ConfigScpiConst.toolStatus("PORT-STATUS"))
+                scpiTelnetHandler.sendCommand(ConfigScpiConst.toolStatus("SOURCE")),
+                scpiTelnetHandler.sendCommand(ConfigScpiConst.toolStatus("DESTINATION")),
+                scpiTelnetHandler.sendCommand(ConfigScpiConst.toolStatus("FLOW-CONTROL")),
+                scpiTelnetHandler.sendCommand(ConfigScpiConst.toolStatus("CREDIT")),
+                scpiTelnetHandler.sendCommand(ConfigScpiConst.toolStatus("LOGGING")),
+                scpiTelnetHandler.sendCommand(ConfigScpiConst.toolStatus("TOPOLOGY")),
+                scpiTelnetHandler.sendCommand(ConfigScpiConst.toolStatus("FABRIC-STATUS")),
+                scpiTelnetHandler.sendCommand(ConfigScpiConst.toolStatus("PORT-STATUS"))
         );
     }
 
     public ToolStatus getToolStatus() {
         return new ToolStatus(
-                telnetConfigUtil.sendCommand(ConfigScpiConst.fcbertConfiguration("COUPLED")),
-                telnetConfigUtil.sendCommand(ConfigScpiConst.fcbertConfiguration("PATTERN")),
-                telnetConfigUtil.sendCommand(ConfigScpiConst.fcbertConfiguration("FRAME-SIZE")),
-                telnetConfigUtil.sendCommand(ConfigScpiConst.fcbertConfiguration("STREAM-RATE"))
+                scpiTelnetHandler.sendCommand(ConfigScpiConst.fcbertConfiguration("COUPLED")),
+                scpiTelnetHandler.sendCommand(ConfigScpiConst.fcbertConfiguration("PATTERN")),
+                scpiTelnetHandler.sendCommand(ConfigScpiConst.fcbertConfiguration("FRAME-SIZE")),
+                scpiTelnetHandler.sendCommand(ConfigScpiConst.fcbertConfiguration("STREAM-RATE"))
         );
     }
 
     public String getPSPLinkStatus() {
-        return telnetConfigUtil.sendCommand(ConfigScpiConst.pspLink("LINK"));
+        return scpiTelnetHandler.sendCommand(ConfigScpiConst.pspLink("LINK"));
     }
 }
