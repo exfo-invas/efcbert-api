@@ -20,28 +20,30 @@ public class TelnetConfig {
         return telnetClient;
     }
 
-    public boolean getConnection(String ipAddress, int port) {
+    public void getConnection(String ipAddress, int port) {
         try {
-            return isIPv6Address(ipAddress) ? connectIPv6(ipAddress, port) : connectIPv4(ipAddress, port);
-        } catch (IOException e) {
-            return false;
+            if (isIPv6Address(ipAddress)) {
+                connectIPv6(ipAddress, port);
+            } else {
+                connectIPv4(ipAddress, port);
+            }
+        } catch (IOException ignored) {
+            log.info("TelnetConfig getConnection failed");
         }
     }
 
-    private boolean connectIPv6(String ipAddress, int port) throws IOException {
+    private void connectIPv6(String ipAddress, int port) throws IOException {
         System.setProperty("java.net.preferIPv6Addresses", "true");
         telnetClient = new TelnetClient();
         telnetClient.connect(ipAddress, port);
-        log.info("TelnetConfig Ipv6 Connected to {}:{}", ipAddress, port);
-        return getStatus();
+        log.info("TelnetConfig Ipv6 Connected to {}:{}: Status: {}", ipAddress, port, getStatus());
     }
 
-    private boolean connectIPv4(String ipAddress, int port) throws IOException {
+    private void connectIPv4(String ipAddress, int port) throws IOException {
         System.setProperty("java.net.preferIPv6Addresses", "false");
         telnetClient = new TelnetClient();
         telnetClient.connect(ipAddress, port);
-        log.info("TelnetConfig Ipv4 Connected to {}:{}", ipAddress, port);
-        return getStatus();
+        log.info("TelnetConfig Ipv4 Connected to {}:{} Status: {}", ipAddress, port, getStatus());
     }
 
     private boolean isIPv6Address(String ipAddress) {
