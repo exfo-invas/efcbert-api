@@ -1,6 +1,5 @@
 package com.invas.enhanced.fc.bert.service.config;
 
-import com.invas.enhanced.fc.bert.config.TelnetConfig;
 import com.invas.enhanced.fc.bert.model.config.PortStatus;
 import com.invas.enhanced.fc.bert.model.config.PhysicalStatus;
 import com.invas.enhanced.fc.bert.model.config.ToolStatus;
@@ -15,9 +14,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ConfigServiceImpl implements ConfigService {
 
-    private final TelnetConfig telnetConfig;
-
-    ScpiTelnetHandler scpiTelnetHandler = new ScpiTelnetHandler(telnetConfig);
+    private final ScpiTelnetHandler scpiTelnetHandler;
 
     @Override
     public String testControl(boolean toggle) {
