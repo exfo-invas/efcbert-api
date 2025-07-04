@@ -37,7 +37,7 @@ public class TelnetServiceImpl implements TelnetService {
     }
 
     public String status() {
-        log.info(telnetConfig.getAddress());
+        log.info("Get Status {}", telnetConfig.getStatus());
         return telnetConfig.getStatus() ? "true" : "false";
     }
 
