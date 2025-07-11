@@ -42,14 +42,13 @@ public class ConfigServiceImpl implements ConfigService {
     }
 
     @Override
-    public PhysicalStatus getPhysicalStatus() {
+    public PhysicalStatus getPhysicalStatus() {        
 
         //Execute command to get status
         return new PhysicalStatus(
                 scpiTelnetHandler.sendCommand(ConfigScpiConst.laserCntrl("STAT")),
                 scpiTelnetHandler.sendCommand(ConfigScpiConst.interfaceType("VALUE")),
                 scpiTelnetHandler.sendCommand(ConfigScpiConst.physicalPort("STATUS")),
-                scpiTelnetHandler.sendCommand(ConfigScpiConst.logging("LINK-STATUS")),
                 scpiTelnetHandler.sendCommand(ConfigScpiConst.consoleOuput("TX")),
                 scpiTelnetHandler.sendCommand(ConfigScpiConst.consoleOuput("RX"))
         );
@@ -62,23 +61,18 @@ public class ConfigServiceImpl implements ConfigService {
     public PortStatus getPortStatus() {
         //Execute command to get status
         return new PortStatus(
-                ConfigScpiConst.toolStatus("SOURCE"),
-                ConfigScpiConst.toolStatus("DESTINATION"),
-                ConfigScpiConst.toolStatus("FLOW-CONTROL"),
-                ConfigScpiConst.toolStatus("CREDIT"),
-                ConfigScpiConst.toolStatus("LOGGING"),
-                ConfigScpiConst.toolStatus("TOPOLOGY"),
-                ConfigScpiConst.toolStatus("FABRIC-STATUS"),
-                ConfigScpiConst.toolStatus("PORT-STATUS")
+            scpiTelnetHandler.sendCommand(ConfigScpiConst.toolStatus("FLOW-CONTROL")),
+            scpiTelnetHandler.sendCommand(ConfigScpiConst.toolStatus("CREDIT-STAT")),
+            scpiTelnetHandler.sendCommand(ConfigScpiConst.toolStatus("LOGGING-STAT"))
         );
     }
 
     public ToolStatus getToolStatus() {
         return new ToolStatus(
-                scpiTelnetHandler.sendCommand(ConfigScpiConst.fcbertConfiguration("COUPLED")),
+                scpiTelnetHandler.sendCommand(ConfigScpiConst.fcbertConfiguration("COUPLED-STAT")),
                 scpiTelnetHandler.sendCommand(ConfigScpiConst.fcbertConfiguration("PATTERN")),
-                scpiTelnetHandler.sendCommand(ConfigScpiConst.fcbertConfiguration("FRAME-SIZE")),
-                scpiTelnetHandler.sendCommand(ConfigScpiConst.fcbertConfiguration("STREAM-RATE"))
+                scpiTelnetHandler.sendCommand(ConfigScpiConst.fcbertConfiguration("FRAME-SIZE-STAT")),
+                scpiTelnetHandler.sendCommand(ConfigScpiConst.fcbertConfiguration("STREAM-RATE-STAT"))
         );
     }
 

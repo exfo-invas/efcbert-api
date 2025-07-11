@@ -101,8 +101,8 @@ public class ConfigScpiConst {
             case "SOURCE" -> LINS_SOURCE + FIBER_PORT + " WSO"; //Add ? or SOURCE input
             case "DESTINATION" -> LINS_SOURCE + FIBER_PORT + " WDES";//Add ? or DESTINATION input
             case "FLOW-CONTROL" -> LINS_SOURCE + FIBER_PORT + "FCON:ENAB";//Add ? or ON or OFF
-            case "CREDIT" -> LINS_SOURCE + FIBER_PORT + "AVA:BBCR";//Add ? or value
-            case "LOGGING" -> LINS_SOURCE + FIBER_PORT + "LOG:STAT";//Add ? or ON or OFF
+            case "CREDIT-STAT" -> LINS_SOURCE + FIBER_PORT + "AVA:BBCR?";//Add ? or value
+            case "LOGGING-STAT" -> LINS_SOURCE + FIBER_PORT + "LOG:STAT?";//Add ? or ON or OFF
             case "TOPOLOGY" -> LINS_SOURCE + FIBER_PORT + "DTOP?";
             case "FABRIC-STATUS" -> LINS_SOURCE + FIBER_PORT + "FLOG:STAT?";
             case "PORT-STATUS" -> LINS_SOURCE + FIBER_PORT + "PLOG:STAT?";
@@ -157,10 +157,10 @@ public class ConfigScpiConst {
 
     public static String fcbertConfiguration(String type) {
         String command = switch (type.toUpperCase()) {
-            case "COUPLED" -> LINS_SENS + "COUP"; //Add ? or ON or OFF
+            case "COUPLED-STAT" -> LINS_SENS + "COUP?"; //Add ? or ON or OFF
             case "PATTERN" -> LINS_SOURCE + "PATT:TYPE?";
-            case "FRAME-SIZE" -> LINS_SOURCE + "FIB:STR:SIZE";//Add ? or value
-            case "STREAM-RATE" -> LINS_SOURCE + "FIB:STR:RATE";//Add ? or value
+            case "FRAME-SIZE-STAT" -> LINS_SOURCE + "FIB:STR:SIZE?";//Add ? or value
+            case "STREAM-RATE-STAT" -> LINS_SOURCE + "FIB:STR:RATE?";//Add ? or value
             default -> "";
         };
         log.info("FCBERT Configuration commands: {}", command);
