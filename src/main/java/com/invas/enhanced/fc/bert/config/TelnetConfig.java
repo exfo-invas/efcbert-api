@@ -2,7 +2,6 @@ package com.invas.enhanced.fc.bert.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.net.telnet.TelnetClient;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
@@ -13,12 +12,7 @@ import java.io.OutputStream;
 @Configuration
 public class TelnetConfig {
 
-    private TelnetClient telnetClient = new TelnetClient();
-
-    @Bean
-    public TelnetClient telnetClient() {
-        return telnetClient;
-    }
+    private final TelnetClient telnetClient = new TelnetClient();
 
     public void getConnection(String ipAddress, int port) {
         try {
@@ -34,14 +28,12 @@ public class TelnetConfig {
 
     private void connectIPv6(String ipAddress, int port) throws IOException {
         System.setProperty("java.net.preferIPv6Addresses", "true");
-        telnetClient = new TelnetClient();
         telnetClient.connect(ipAddress, port);
         log.info("TelnetConfig Ipv6 Connected to {}:{}: Status: {}", ipAddress, port, getStatus());
     }
 
     private void connectIPv4(String ipAddress, int port) throws IOException {
         System.setProperty("java.net.preferIPv6Addresses", "false");
-        telnetClient = new TelnetClient();
         telnetClient.connect(ipAddress, port);
         log.info("TelnetConfig Ipv4 Connected to {}:{} Status: {}", ipAddress, port, getStatus());
     }

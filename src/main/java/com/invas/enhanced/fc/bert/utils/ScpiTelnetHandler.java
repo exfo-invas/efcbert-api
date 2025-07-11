@@ -3,25 +3,44 @@ package com.invas.enhanced.fc.bert.utils;
 import com.invas.enhanced.fc.bert.config.TelnetConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 
 @Slf4j
 @Service
+@Configuration
 @RequiredArgsConstructor
 public class ScpiTelnetHandler {
 
     private final TelnetConfig telnetConfig;
 
-    /**
-     * Sends a command to the telnet server and returns the response.
-     *
-     * @param command The command to send.
-     * @return The response from the server.
-     */
+    private PrintWriter writer;
+    /*private Scanner reader;*/
+    private BufferedReader reader;
+
+    public boolean getConnection(String localIpaddress, int port) {
+        telnetConfig.getConnection(localIpaddress, port);
+
+        if (telnetConfig.getStatus()) {
+            writer = new PrintWriter(telnetConfig.getOutputStream(), true);
+            reader = new BufferedReader(new InputStreamReader(telnetConfig.getInputStream()));
+            log.info("TelnetConfigUtil Connected to {}:{}", localIpaddress, port);
+            log.info("TelnetConfigUtil writer: {} \n reader: {}", writer.checkError(), reader);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean getStatus() {
+        return telnetConfig.getStatus();
+    }
+
+    public String getAddress() {
+        return telnetConfig.getAddress();
+    }
+
     public String sendCommand(String command) {
         if (!telnetConfig.getStatus()) {
             return "Connection is not established";
@@ -46,5 +65,9 @@ public class ScpiTelnetHandler {
             log.error("Error during command execution: {}", e.getMessage(), e);
             return "Failed to send command";
         }
+    }
+
+    public void disconnect() {
+        telnetConfig.disconnect();
     }
 }

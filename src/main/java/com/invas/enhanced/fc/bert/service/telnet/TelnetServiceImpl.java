@@ -1,29 +1,29 @@
 package com.invas.enhanced.fc.bert.service.telnet;
 
 import com.invas.enhanced.fc.bert.config.FetchIPAddress;
-import com.invas.enhanced.fc.bert.config.TelnetConfig;
 import com.invas.enhanced.fc.bert.model.telnet.ConnectionResponse;
 import com.invas.enhanced.fc.bert.model.telnet.IPAddress;
+import com.invas.enhanced.fc.bert.utils.ScpiTelnetHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-@Service
 @Slf4j
+@Service
 @RequiredArgsConstructor
 public class TelnetServiceImpl implements TelnetService {
 
-    private final TelnetConfig telnetConfig;
+    private final ScpiTelnetHandler scpiTelnetHandler;
     private final FetchIPAddress fetchIPAddress;
 
     @Override
     public ConnectionResponse getConnection(String localIpaddress, int port) {
-        telnetConfig.getConnection(localIpaddress, port);
+        boolean connected = scpiTelnetHandler.getConnection(localIpaddress, port);
 
         return new ConnectionResponse(
-                telnetConfig.getStatus(),
+                connected,
                 localIpaddress,
-                telnetConfig.getStatus() ? "Connection established successfully" : "Connection failed"
+                connected ? "Connection established successfully" : "Connection failed"
         );
     }
 
@@ -32,13 +32,13 @@ public class TelnetServiceImpl implements TelnetService {
     }
 
     public String disconnect() {
-        telnetConfig.disconnect();
-        return !telnetConfig.getStatus() ? "true" : "false";
+        scpiTelnetHandler.disconnect();
+        return !scpiTelnetHandler.getStatus() ? "true" : "false";
     }
 
     public String status() {
-        log.info("Get Status {}", telnetConfig.getStatus());
-        return telnetConfig.getStatus() ? "true" : "false";
+        log.info("Get Status {}", scpiTelnetHandler.getStatus());
+        return scpiTelnetHandler.getStatus() ? "true" : "false";
     }
 
 }

@@ -60,16 +60,31 @@ public class ConfigServiceImpl implements ConfigService {
     }
 
     public PortStatus getPortStatus() {
+
+        String stringBlock = "BEGIN\n" +
+                ConfigScpiConst.toolStatus("SOURCE") + "\n" +
+                ConfigScpiConst.toolStatus("DESTINATION") + "\n" +
+                ConfigScpiConst.toolStatus("FLOW-CONTROL") + "\n" +
+                ConfigScpiConst.toolStatus("CREDIT") + "\n" +
+                ConfigScpiConst.toolStatus("LOGGING") + "\n" +
+                ConfigScpiConst.toolStatus("TOPOLOGY") + "\n" +
+                ConfigScpiConst.toolStatus("FABRIC-STATUS") + "\n" +
+                ConfigScpiConst.toolStatus("PORT-STATUS") + "\n" +
+                "END";
+
+        String[] response = scpiTelnetHandler.sendCommand(stringBlock).split("\n");
+
+
         //Execute command to get status
         return new PortStatus(
-                scpiTelnetHandler.sendCommand(ConfigScpiConst.toolStatus("SOURCE")),
-                scpiTelnetHandler.sendCommand(ConfigScpiConst.toolStatus("DESTINATION")),
-                scpiTelnetHandler.sendCommand(ConfigScpiConst.toolStatus("FLOW-CONTROL")),
-                scpiTelnetHandler.sendCommand(ConfigScpiConst.toolStatus("CREDIT")),
-                scpiTelnetHandler.sendCommand(ConfigScpiConst.toolStatus("LOGGING")),
-                scpiTelnetHandler.sendCommand(ConfigScpiConst.toolStatus("TOPOLOGY")),
-                scpiTelnetHandler.sendCommand(ConfigScpiConst.toolStatus("FABRIC-STATUS")),
-                scpiTelnetHandler.sendCommand(ConfigScpiConst.toolStatus("PORT-STATUS"))
+                response[0],
+                response[1],
+                response[2],
+                response[3],
+                response[4],
+                response[5],
+                response[6],
+                response[7]
         );
     }
 
