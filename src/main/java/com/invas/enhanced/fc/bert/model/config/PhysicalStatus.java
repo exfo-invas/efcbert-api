@@ -12,7 +12,6 @@ public class PhysicalStatus {
     private String laserStatus;
     private String fcRate;
     private String sfpnPort;
-    private String linkStatus;
     private String txPower;
     private String rxPower;
 

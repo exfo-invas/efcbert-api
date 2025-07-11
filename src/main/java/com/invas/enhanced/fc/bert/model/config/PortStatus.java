@@ -10,12 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class PortStatus {
 
-    private String source;
-    private String destination;
     private String flowControl;
     private String bufferCredit;
     private String loging;
-    private String topology;
-    private String fabricStatus;
-    private String portStatus;
 }
