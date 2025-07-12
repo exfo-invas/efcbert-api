@@ -13,7 +13,7 @@ public class ConfigScpiConst {
     private static final String OPT_PORT_FREQ = "OPT:PORT:FREQ";
     private static final String SDT = "SDT:";
     private static final String TEST = "TEST";
-    private static final String OPT_PORT = "OPT:PORT:";
+    private static final String OPT_PORT = "OPT:";
     private static final String ETH_PORT_TRAN = "ETH:PORT:TRAN";
     private static final String FIBER_PORT = "FIB:PORT:";
 
