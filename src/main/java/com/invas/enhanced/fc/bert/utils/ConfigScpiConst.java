@@ -13,7 +13,7 @@ public class ConfigScpiConst {
     private static final String OPT_PORT_FREQ = "OPT:PORT:FREQ";
     private static final String SDT = "SDT:";
     private static final String TEST = "TEST";
-    private static final String OPT_PORT = "OPT:PORT:";
+    private static final String OPT_PORT = "OPT:";
     private static final String ETH_PORT_TRAN = "ETH:PORT:TRAN";
     private static final String FIBER_PORT = "FIB:PORT:";
 
@@ -100,7 +100,7 @@ public class ConfigScpiConst {
         String command = switch (type.toUpperCase()) {
             case "SOURCE" -> LINS_SOURCE + FIBER_PORT + " WSO"; //Add ? or SOURCE input
             case "DESTINATION" -> LINS_SOURCE + FIBER_PORT + " WDES";//Add ? or DESTINATION input
-            case "FLOW-CONTROL" -> LINS_SOURCE + FIBER_PORT + "FCON:ENAB";//Add ? or ON or OFF
+            case "FLOW-CONTROL" -> LINS_SOURCE + FIBER_PORT + "FCON:ENAB?";//Add ? or ON or OFF
             case "CREDIT-STAT" -> LINS_SOURCE + FIBER_PORT + "AVA:BBCR?";//Add ? or value
             case "LOGGING-STAT" -> LINS_SOURCE + FIBER_PORT + "LOG:STAT?";//Add ? or ON or OFF
             case "TOPOLOGY" -> LINS_SOURCE + FIBER_PORT + "DTOP?";
