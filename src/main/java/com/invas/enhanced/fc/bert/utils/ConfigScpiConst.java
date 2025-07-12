@@ -100,7 +100,7 @@ public class ConfigScpiConst {
         String command = switch (type.toUpperCase()) {
             case "SOURCE" -> LINS_SOURCE + FIBER_PORT + " WSO"; //Add ? or SOURCE input
             case "DESTINATION" -> LINS_SOURCE + FIBER_PORT + " WDES";//Add ? or DESTINATION input
-            case "FLOW-CONTROL" -> LINS_SOURCE + FIBER_PORT + "FCON:ENAB";//Add ? or ON or OFF
+            case "FLOW-CONTROL" -> LINS_SOURCE + FIBER_PORT + "FCON:ENAB?";//Add ? or ON or OFF
             case "CREDIT-STAT" -> LINS_SOURCE + FIBER_PORT + "AVA:BBCR?";//Add ? or value
             case "LOGGING-STAT" -> LINS_SOURCE + FIBER_PORT + "LOG:STAT?";//Add ? or ON or OFF
             case "TOPOLOGY" -> LINS_SOURCE + FIBER_PORT + "DTOP?";
@@ -184,7 +184,7 @@ public class ConfigScpiConst {
     public static String pspLink(String type) {
         String FIBER = "FIB:";
         String command = switch (type.toUpperCase()) {
-            case "LINK" -> LINS_FETCH + FIBER + ":LINK?";
+            case "LINK" -> LINS_FETCH + FIBER + "LINK?";
             case "ENABLE" -> LINS_SOURCE + FIBER + "PSP ON";
             case "DISABLE" -> LINS_SOURCE + FIBER + "PSP OFF";
             case "STATUS" -> LINS_SOURCE + FIBER + "PSP?";

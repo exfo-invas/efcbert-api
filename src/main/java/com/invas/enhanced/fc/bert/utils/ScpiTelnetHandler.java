@@ -45,10 +45,7 @@ public class ScpiTelnetHandler {
         if (!telnetConfig.getStatus()) {
             return "Connection is not established";
         }
-        try (
-                PrintWriter writer = new PrintWriter(telnetConfig.getOutputStream(), true);
-                BufferedReader reader = new BufferedReader(new InputStreamReader(telnetConfig.getInputStream()))
-        ) {
+        try {
             writer.println(command);
             writer.flush();
             StringBuilder response = new StringBuilder();
