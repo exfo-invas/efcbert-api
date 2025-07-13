@@ -1,7 +1,6 @@
 package com.invas.enhanced.fc.bert.utils;
 
 import com.invas.enhanced.fc.bert.config.TelnetConfig;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
@@ -11,7 +10,6 @@ import java.io.*;
 @Slf4j
 @Service
 @Configuration
-@RequiredArgsConstructor
 public class ScpiTelnetHandler {
 
     private final TelnetConfig telnetConfig;
@@ -19,6 +17,10 @@ public class ScpiTelnetHandler {
     private PrintWriter writer;
     /*private Scanner reader;*/
     private BufferedReader reader;
+
+    public ScpiTelnetHandler(TelnetConfig telnetConfig) {
+        this.telnetConfig = telnetConfig;
+    }
 
     public boolean getConnection(String localIpaddress, int port) {
         telnetConfig.getConnection(localIpaddress, port);
@@ -57,11 +59,40 @@ public class ScpiTelnetHandler {
                     break;
                 }
             }
-            return response.toString();
+            return sanitizeResponse(response.toString());
         } catch (Exception e) {
             log.error("Error during command execution: {}", e.getMessage(), e);
             return "Failed to send command";
         }
+    }
+
+    /**
+     * Cleans SCPI response:
+     * - Removes "READY>" and trailing newlines/spaces
+     * - Ignores response if it contains "error" (case-insensitive)
+     * - Returns cleaned data if valid, otherwise null
+     */
+    private String sanitizeResponse(String response) {
+        if (response == null) {
+            return null;
+        }
+
+        response = response.trim();
+
+        final String prefix = "READY>";
+        if (!response.startsWith(prefix)) {
+            return null;
+        }
+
+        // Remove "READY>" and trim remaining
+        String cleaned = response.substring(prefix.length()).trim();
+
+        // Check for "error" case-insensitively
+        if (cleaned.toLowerCase().contains("error")) {
+            return null; // indicates failure, ignore
+        }
+
+        return cleaned;
     }
 
     public void disconnect() {
