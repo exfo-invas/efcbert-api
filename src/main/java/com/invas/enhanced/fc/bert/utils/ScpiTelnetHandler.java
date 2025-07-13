@@ -59,6 +59,7 @@ public class ScpiTelnetHandler {
                     break;
                 }
             }
+            log.info("Command sent: {}, Response: {}", command, response);
             return sanitizeResponse(response.toString());
         } catch (Exception e) {
             log.error("Error during command execution: {}", e.getMessage(), e);
@@ -91,6 +92,7 @@ public class ScpiTelnetHandler {
         if (cleaned.toLowerCase().contains("error")) {
             return null; // indicates failure, ignore
         }
+        log.info("Sanitized response: {}", cleaned);
 
         return cleaned;
     }
