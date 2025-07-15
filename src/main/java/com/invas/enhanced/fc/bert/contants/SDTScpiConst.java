@@ -1,4 +1,4 @@
-package com.invas.enhanced.fc.bert.utils;
+package com.invas.enhanced.fc.bert.contants;
 
 public class SDTScpiConst {
 

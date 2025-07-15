@@ -3,8 +3,8 @@ package com.invas.enhanced.fc.bert.service.config;
 import com.invas.enhanced.fc.bert.model.config.PortStatus;
 import com.invas.enhanced.fc.bert.model.config.PhysicalStatus;
 import com.invas.enhanced.fc.bert.model.config.ToolStatus;
-import com.invas.enhanced.fc.bert.utils.ConfigScpiConst;
-import com.invas.enhanced.fc.bert.utils.ScpiTelnetHandler;
+import com.invas.enhanced.fc.bert.contants.ConfigScpiConst;
+import com.invas.enhanced.fc.bert.service.ScpiTelnetService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,31 +14,31 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ConfigServiceImpl implements ConfigService {
 
-    private final ScpiTelnetHandler scpiTelnetHandler;
+    private final ScpiTelnetService scpiTelnetService;
 
     @Override
     public String testControl(boolean toggle) {
-        return scpiTelnetHandler.sendCommand(ConfigScpiConst.controller(toggle? "START" : "STOP"));
+        return scpiTelnetService.sendCommand(ConfigScpiConst.controller(toggle? "START" : "STOP"));
     }
 
     @Override
     public String testReset() {
-        return scpiTelnetHandler.sendCommand(ConfigScpiConst.controller("RESET"));
+        return scpiTelnetService.sendCommand(ConfigScpiConst.controller("RESET"));
     }
 
     @Override
     public String testTime() {
-        return scpiTelnetHandler.sendCommand(ConfigScpiConst.controller("RESET"));
+        return scpiTelnetService.sendCommand(ConfigScpiConst.controller("RESET"));
     }
 
     @Override
     public String togglePSPLink(boolean toggle) {
-        return scpiTelnetHandler.sendCommand(ConfigScpiConst.pspLink(toggle ? "ENABLE" : "DISABLE"));
+        return scpiTelnetService.sendCommand(ConfigScpiConst.pspLink(toggle ? "ENABLE" : "DISABLE"));
     }
 
     @Override
     public String getPSPLink() {
-        return scpiTelnetHandler.sendCommand(ConfigScpiConst.pspLink("LINK"));
+        return scpiTelnetService.sendCommand(ConfigScpiConst.pspLink("LINK"));
     }
 
     @Override
@@ -46,37 +46,37 @@ public class ConfigServiceImpl implements ConfigService {
 
         //Execute command to get status
         return new PhysicalStatus(
-                scpiTelnetHandler.sendCommand(ConfigScpiConst.laserCntrl("STAT")),
-                scpiTelnetHandler.sendCommand(ConfigScpiConst.interfaceType("VALUE")),
-                scpiTelnetHandler.sendCommand(ConfigScpiConst.physicalPort("STATUS")),
-                scpiTelnetHandler.sendCommand(ConfigScpiConst.consoleOuput("TX")),
-                scpiTelnetHandler.sendCommand(ConfigScpiConst.consoleOuput("RX"))
+                scpiTelnetService.sendCommand(ConfigScpiConst.laserCntrl("STAT")),
+                scpiTelnetService.sendCommand(ConfigScpiConst.interfaceType("VALUE")),
+                scpiTelnetService.sendCommand(ConfigScpiConst.physicalPort("STATUS")),
+                scpiTelnetService.sendCommand(ConfigScpiConst.consoleOuput("TX")),
+                scpiTelnetService.sendCommand(ConfigScpiConst.consoleOuput("RX"))
         );
     }
 
     public String laserControl(boolean type) {
-        return scpiTelnetHandler.sendCommand(ConfigScpiConst.laserCntrl(type ? "ON" : "OFF"));
+        return scpiTelnetService.sendCommand(ConfigScpiConst.laserCntrl(type ? "ON" : "OFF"));
     }
 
     public PortStatus getPortStatus() {
         //Execute command to get status
         return new PortStatus(
-            scpiTelnetHandler.sendCommand(ConfigScpiConst.toolStatus("FLOW-CONTROL")),
-            scpiTelnetHandler.sendCommand(ConfigScpiConst.toolStatus("CREDIT-STAT")),
-            scpiTelnetHandler.sendCommand(ConfigScpiConst.toolStatus("LOGGING-STAT"))
+            scpiTelnetService.sendCommand(ConfigScpiConst.toolStatus("FLOW-CONTROL")),
+            scpiTelnetService.sendCommand(ConfigScpiConst.toolStatus("CREDIT-STAT")),
+            scpiTelnetService.sendCommand(ConfigScpiConst.toolStatus("LOGGING-STAT"))
         );
     }
 
     public ToolStatus getToolStatus() {
         return new ToolStatus(
-                scpiTelnetHandler.sendCommand(ConfigScpiConst.fcbertConfiguration("COUPLED-STAT")),
-                scpiTelnetHandler.sendCommand(ConfigScpiConst.fcbertConfiguration("PATTERN")),
-                scpiTelnetHandler.sendCommand(ConfigScpiConst.fcbertConfiguration("FRAME-SIZE-STAT")),
-                scpiTelnetHandler.sendCommand(ConfigScpiConst.fcbertConfiguration("STREAM-RATE-STAT"))
+                scpiTelnetService.sendCommand(ConfigScpiConst.fcbertConfiguration("COUPLED-STAT")),
+                scpiTelnetService.sendCommand(ConfigScpiConst.fcbertConfiguration("PATTERN")),
+                scpiTelnetService.sendCommand(ConfigScpiConst.fcbertConfiguration("FRAME-SIZE-STAT")),
+                scpiTelnetService.sendCommand(ConfigScpiConst.fcbertConfiguration("STREAM-RATE-STAT"))
         );
     }
 
     public String getPSPLinkStatus() {
-        return scpiTelnetHandler.sendCommand(ConfigScpiConst.pspLink("LINK"));
+        return scpiTelnetService.sendCommand(ConfigScpiConst.pspLink("LINK"));
     }
 }

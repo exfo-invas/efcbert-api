@@ -1,11 +1,13 @@
 package com.invas.enhanced.fc.bert.model.event.disruptions;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class EventDisruptions {
-    private ServiceDisruptions[] service;
     private TrafficResponse[] traffic;
+    private FrameLoss frameLoss;
 }

@@ -1,4 +1,4 @@
-package com.invas.enhanced.fc.bert.model.event.disruptions;
+package com.invas.enhanced.fc.bert.model.event.throughput;
 
 import lombok.Getter;
 import lombok.Setter;

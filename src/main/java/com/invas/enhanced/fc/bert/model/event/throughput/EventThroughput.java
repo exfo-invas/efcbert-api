@@ -1,5 +1,6 @@
 package com.invas.enhanced.fc.bert.model.event.throughput;
 
+import com.invas.enhanced.fc.bert.model.event.disruptions.FrameLoss;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,5 +9,5 @@ import lombok.Setter;
 public class EventThroughput {
 
     private ThroughputData[] throughputData;
-    private FrameLoss[] frameLoss;
+    private ServiceDisruptions[] serviceDisruptions;
 }

@@ -1,20 +1,20 @@
 package com.invas.enhanced.fc.bert.model.event.disruptions;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class TrafficResponse {
     private String type;
     private String fcRate;
-    private String protocol;
-    private String encoding;
-    private String actualThroughput;
-    private String actualTransferSpeed;
-    private String lineSpeed;
-    private String currentUtilization;
-    private String measuredThroughput;
-    private String transferSpeed;
-    private String measuredLineSpeed;
+    private double actualThroughput;
+    private double actualTransferSpeed;
+    private double lineSpeed;
+    private double currentUtilization;
+    private double measuredThroughput;
+    private double transferSpeed;
+    private double measuredLineSpeed;
 }

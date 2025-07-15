@@ -1,6 +1,7 @@
-package com.invas.enhanced.fc.bert.utils;
+package com.invas.enhanced.fc.bert.service;
 
 import com.invas.enhanced.fc.bert.config.TelnetConfig;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
@@ -10,7 +11,7 @@ import java.io.*;
 @Slf4j
 @Service
 @Configuration
-public class ScpiTelnetHandler {
+public class ScpiTelnetService {
 
     private final TelnetConfig telnetConfig;
 
@@ -18,7 +19,7 @@ public class ScpiTelnetHandler {
     /*private Scanner reader;*/
     private BufferedReader reader;
 
-    public ScpiTelnetHandler(TelnetConfig telnetConfig) {
+    public ScpiTelnetService(TelnetConfig telnetConfig) {
         this.telnetConfig = telnetConfig;
     }
 
@@ -43,7 +44,7 @@ public class ScpiTelnetHandler {
         return telnetConfig.getAddress();
     }
 
-    public String sendCommand(String command) {
+    public synchronized String sendCommand(String command) {
         if (!telnetConfig.getStatus()) {
             return "Connection is not established";
         }
