@@ -1,0 +1,318 @@
+openapi: 3.0.1
+info:
+  title: Enhanced FC Bert API
+  version: 1.0.0
+  description: API documentation for Enhanced FC Bert application
+
+servers:
+  - url: http://localhost:8080
+
+tags:
+  - name: Telnet
+    description: Telnet connection operations
+  - name: Config
+    description: Configuration operations
+  - name: Event
+    description: Event disruptions operations
+
+paths:
+  /telnet/connect/{ip}/{port}:
+    get:
+      tags: [Telnet]
+      summary: Open Telnet connection
+      parameters:
+        - name: ip
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: port
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Connection response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectionResponse'
+
+  /telnet/ip:
+    get:
+      tags: [Telnet]
+      summary: Get server IP addresses
+      responses:
+        '200':
+          description: IP address info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IPAddress'
+
+  /telnet/status:
+    get:
+      tags: [Telnet]
+      summary: Get Telnet connection status
+      responses:
+        '200':
+          description: Connection status
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /telnet/disconnect:
+    get:
+      tags: [Telnet]
+      summary: Disconnect Telnet connection
+      responses:
+        '200':
+          description: Disconnection status
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /config/status/full:
+    get:
+      tags: [Config]
+      summary: Get full configuration status
+      responses:
+        '200':
+          description: Full configuration status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FullConfigStatus'
+
+  /config/laser/{toggle}:
+    get:
+      tags: [Config]
+      summary: Toggle laser control
+      parameters:
+        - name: toggle
+          in: path
+          required: true
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Laser control response
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /config/test/{toggle}:
+    get:
+      tags: [Config]
+      summary: Start or stop test
+      parameters:
+        - name: toggle
+          in: path
+          required: true
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Test control response
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /config/test/reset:
+    get:
+      tags: [Config]
+      summary: Reset test
+      responses:
+        '200':
+          description: Test reset response
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /config/test/time:
+    get:
+      tags: [Config]
+      summary: Get test time
+      responses:
+        '200':
+          description: Test time response
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /config/psp/{toggle}:
+    get:
+      tags: [Config]
+      summary: Toggle PSP link
+      parameters:
+        - name: toggle
+          in: path
+          required: true
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: PSP link toggle response
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /config/psp/link:
+    get:
+      tags: [Config]
+      summary: Get PSP link status
+      responses:
+        '200':
+          description: PSP link status
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /event/details:
+    get:
+      tags: [Event]
+      summary: Get latest event disruptions
+      responses:
+        '200':
+          description: Latest event disruptions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventDisruptions'
+
+  /event/details/hourly:
+    get:
+      tags: [Event]
+      summary: Get hourly event disruptions list
+      responses:
+        '200':
+          description: Hourly event disruptions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventDisruptions'
+
+components:
+  schemas:
+    ConnectionResponse:
+      type: object
+      properties:
+        status:
+          type: boolean
+        address:
+          type: string
+        message:
+          type: string
+
+    IPAddress:
+      type: object
+      properties:
+        ipv6:
+          type: array
+          items:
+            type: string
+        ipv4:
+          type: string
+
+    FullConfigStatus:
+      type: object
+      properties:
+        physicalStatus:
+          $ref: '#/components/schemas/PhysicalStatus'
+        portStatus:
+          $ref: '#/components/schemas/PortStatus'
+        toolStatus:
+          $ref: '#/components/schemas/ToolStatus'
+        pspLinkStatus:
+          type: string
+
+    PhysicalStatus:
+      type: object
+      properties:
+        laserStatus:
+          type: string
+        fcRate:
+          type: string
+        sfpnPort:
+          type: string
+        txPower:
+          type: string
+        rxPower:
+          type: string
+
+    PortStatus:
+      type: object
+      properties:
+        flowControl:
+          type: string
+        bufferCredit:
+          type: string
+        loging:
+          type: string
+
+    ToolStatus:
+      type: object
+      properties:
+        coupledStatus:
+          type: string
+        patternStatus:
+          type: string
+        frameStatus:
+          type: string
+        streamStatus:
+          type: string
+
+    EventDisruptions:
+      type: object
+      properties:
+        traffic:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrafficResponse'
+        frameLoss:
+          $ref: '#/components/schemas/FrameLoss'
+
+    TrafficResponse:
+      type: object
+      properties:
+        type:
+          type: string
+        fcRate:
+          type: string
+        actualThroughput:
+          type: number
+        actualTransferSpeed:
+          type: number
+        lineSpeed:
+          type: number
+        currentUtilization:
+          type: number
+        measuredThroughput:
+          type: number
+        transferSpeed:
+          type: number
+        measuredLineSpeed:
+          type: number
+
+    FrameLoss:
+      type: object
+      properties:
+        fcRate:
+          type: string
+        txCount:
+          type: integer
+        rxCount:
+          type: integer
+        lostFrames:
+          type: integer

@@ -22,12 +22,19 @@ public class EventService {
     private final ScpiTelnetService scpiTelnetService;
     private final EventAggregatorConfig eventAggregatorConfig;
 
+    private boolean scheduledEventEnabled = false;
+
     public EventService(ScpiTelnetService scpiTelnetService, EventAggregatorConfig eventAggregatorConfig) {
         this.scpiTelnetService = scpiTelnetService;
         this.eventAggregatorConfig = eventAggregatorConfig;
     }
 
-
+    /**
+     * Executes the event disruptions and returns the EventDisruptions object.
+     * This method retrieves the latest event disruptions data from the SCPI commands.
+     *
+     * @return EventDisruptions object containing the latest event disruptions data.
+     */
     public EventDisruptions executeEventDisruptions() {
         EventDisruptions eventDisruptions = new EventDisruptions();
 
@@ -96,16 +103,26 @@ public class EventService {
 
         log.info("EventDisruptions: {}", eventDisruptions);
         return eventDisruptions;
+    }    
+
+    public void startScheduledEvent(boolean enabled) {
+        scheduledEventEnabled = enabled;
     }
 
     @Scheduled(fixedRate = 1000) // runs every second
-    private void getLatestEventDisruption() {
+    private void secondlyEventDisruption() {
+        if (!scheduledEventEnabled) {
+            return;
+        }
         log.info("Scheduling event disruptions execution...");
         eventAggregatorConfig.updateEventDisruptionsList(executeEventDisruptions());
     }
 
     @Scheduled(fixedRate = 3600000) // runs every hour
-    public void hourlyEventDisruptions() {
+    private void hourlyEventDisruptions() {
+        if (!scheduledEventEnabled) {
+            return;
+        }
         log.info("Hourly event disruptions execution...");
         eventAggregatorConfig.updateHourlyEventDisruptions();
     }

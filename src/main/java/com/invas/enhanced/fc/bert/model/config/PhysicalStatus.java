@@ -11,7 +11,7 @@ public class PhysicalStatus {
 
     private String laserStatus;
     private String fcRate;
-    private String sfpnPort;
+    private String sfpPort;
     private String txPower;
     private String rxPower;
 

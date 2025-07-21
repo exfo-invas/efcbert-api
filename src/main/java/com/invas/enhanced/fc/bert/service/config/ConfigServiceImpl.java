@@ -5,6 +5,8 @@ import com.invas.enhanced.fc.bert.model.config.PhysicalStatus;
 import com.invas.enhanced.fc.bert.model.config.ToolStatus;
 import com.invas.enhanced.fc.bert.contants.ConfigScpiConst;
 import com.invas.enhanced.fc.bert.service.ScpiTelnetService;
+import com.invas.enhanced.fc.bert.service.event.EventService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,9 +17,11 @@ import org.springframework.stereotype.Service;
 public class ConfigServiceImpl implements ConfigService {
 
     private final ScpiTelnetService scpiTelnetService;
+    private final EventService eventService;
 
     @Override
     public String testControl(boolean toggle) {
+        eventService.startScheduledEvent(toggle);
         return scpiTelnetService.sendCommand(ConfigScpiConst.controller(toggle? "START" : "STOP"));
     }
 
@@ -70,6 +74,7 @@ public class ConfigServiceImpl implements ConfigService {
     public ToolStatus getToolStatus() {
         return new ToolStatus(
                 scpiTelnetService.sendCommand(ConfigScpiConst.fcbertConfiguration("COUPLED-STAT")),
+                scpiTelnetService.sendCommand(ConfigScpiConst.fcbertConfiguration("PATTERN")),
                 scpiTelnetService.sendCommand(ConfigScpiConst.fcbertConfiguration("PATTERN")),
                 scpiTelnetService.sendCommand(ConfigScpiConst.fcbertConfiguration("FRAME-SIZE-STAT")),
                 scpiTelnetService.sendCommand(ConfigScpiConst.fcbertConfiguration("STREAM-RATE-STAT"))

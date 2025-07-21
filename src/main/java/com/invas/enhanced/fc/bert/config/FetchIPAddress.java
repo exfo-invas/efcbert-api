@@ -42,6 +42,10 @@ public class FetchIPAddress {
 
                     // Print IPv4 and IPv6 addresses
                     if (address instanceof java.net.Inet6Address) {
+                        //If address contains % _ ignore it
+                        if (address.getHostAddress().contains("%")) {
+                            continue;
+                        }
                         ipv6.add(address.getHostAddress());
                         System.out.println("IPv6 Address: " + address.getHostAddress());
                     } else {

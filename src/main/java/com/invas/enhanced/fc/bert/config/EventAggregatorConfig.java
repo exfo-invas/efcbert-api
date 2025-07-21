@@ -3,6 +3,7 @@ package com.invas.enhanced.fc.bert.config;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
+import lombok.Getter;
 import org.springframework.context.annotation.Configuration;
 
 import com.invas.enhanced.fc.bert.model.event.disruptions.EventDisruptions;
@@ -11,21 +12,29 @@ import com.invas.enhanced.fc.bert.model.event.disruptions.TrafficResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
+@Getter
 @Slf4j
 @Configuration
 public class EventAggregatorConfig {
 
     ArrayList<EventDisruptions> eventDisruptionsList = new ArrayList<>();
-
-    public ArrayList<EventDisruptions> getEventDisruptionsList() {
-        return eventDisruptionsList;
-    }
-
-    public ConcurrentHashMap<Integer, EventDisruptions> getHourlyEventMap() {
-        return hourlyEventMap;
-    }
-
     ConcurrentHashMap<Integer, EventDisruptions> hourlyEventMap = new ConcurrentHashMap<>();
+
+    public EventDisruptions getLatestEventDisruption() {
+        if (eventDisruptionsList.isEmpty()) {
+            log.warn("No event disruptions available.");
+            return null;
+        }
+        return eventDisruptionsList.get(eventDisruptionsList.size() - 1);
+    }
+
+    public ArrayList<EventDisruptions> getHourlyEventList() {
+        if (hourlyEventMap.isEmpty()) {
+            log.warn("No event disruptions available.");
+            return new ArrayList<>();
+        }
+        return new ArrayList<>(hourlyEventMap.values());
+    }
 
     public ArrayList<EventDisruptions> updateEventDisruptionsList(EventDisruptions newEventDisruption) {
         eventDisruptionsList.add(newEventDisruption);

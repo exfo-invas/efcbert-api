@@ -8,8 +8,9 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class ToolStatus {
-    private String coupledStatus;
-    private String patternStatus;
-    private String frameStatus;
-    private String streamStatus;
+    private String coupled;
+    private String txPattern;
+    private String rxPattern;
+    private String fcFrameSize;
+    private String trafficShaping;
 }
