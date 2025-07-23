@@ -81,6 +81,10 @@ public class ScpiTelnetService {
 
         response = response.trim();
 
+        if (response.contains("Connected") || response.contains("This operation may take few minutes to complete. Please wait for a while")) {
+            return "true"; // Return as is for these specific cases
+        }
+
         final String prefix = "READY>";
         if (!response.startsWith(prefix)) {
             return null;

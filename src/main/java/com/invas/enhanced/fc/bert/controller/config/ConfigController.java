@@ -31,8 +31,8 @@ public class ConfigController {
     }
 
     @GetMapping("/test/{toggle}")
-    public String toogleTest(@PathVariable boolean toggle) {
-        return configService.testControl(toggle);
+    public boolean toogleTest(@PathVariable boolean toggle) {
+         return configService.testControl(toggle);
     }
 
     @GetMapping("/test/reset")

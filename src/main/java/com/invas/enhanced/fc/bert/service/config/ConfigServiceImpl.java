@@ -20,9 +20,16 @@ public class ConfigServiceImpl implements ConfigService {
     private final EventService eventService;
 
     @Override
-    public String testControl(boolean toggle) {
-        eventService.startScheduledEvent(toggle);
-        return scpiTelnetService.sendCommand(ConfigScpiConst.controller(toggle? "START" : "STOP"));
+    public boolean testControl(boolean toggle) {
+
+        if(scpiTelnetService.sendCommand(ConfigScpiConst.controller(toggle? "START" : "STOP")).equalsIgnoreCase("true")) {
+            eventService.startScheduledEvent(toggle);
+            log.info("Test control command executed successfully: {}", toggle ? "START" : "STOP");
+            return true;
+        } else {
+            log.error("Failed to execute test control command: {}", toggle ? "START" : "STOP");
+            return false;
+        }
     }
 
     @Override

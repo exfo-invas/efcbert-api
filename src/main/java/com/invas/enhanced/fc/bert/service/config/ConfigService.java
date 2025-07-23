@@ -17,7 +17,7 @@ public interface ConfigService {
 
     String getPSPLinkStatus();
 
-    String testControl(boolean toggle);
+    boolean testControl(boolean toggle);
 
     String testReset();
 
