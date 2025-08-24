@@ -75,31 +75,28 @@ public class ScpiTelnetService {
      * - Returns cleaned data if valid, otherwise null
      */
     private String sanitizeResponse(String response) {
-        if (response == null) {
+        if (response == null || response.isBlank()) {
             return null;
         }
 
-        response = response.trim();
+        if (response.contains("Connected")) {
+            return "true";
+        }
 
-        if (response.contains("Connected") || response.contains("This operation may take few minutes to complete. Please wait for a while")) {
-            return "true"; // Return as is for these specific cases
+        if (response.contains("Connection is not established")) {
+            return null;
         }
 
         final String prefix = "READY>";
-        if (!response.startsWith(prefix)) {
-            return null;
+        if (response.startsWith(prefix)) {
+            String cleaned = response.substring(prefix.length()).trim();
+            if (!cleaned.toLowerCase().contains("error")) {
+                log.info("Sanitized response: {}", cleaned);
+                return cleaned;
+            }
         }
 
-        // Remove "READY>" and trim remaining
-        String cleaned = response.substring(prefix.length()).trim();
-
-        // Check for "error" case-insensitively
-        if (cleaned.toLowerCase().contains("error")) {
-            return null; // indicates failure, ignore
-        }
-        log.info("Sanitized response: {}", cleaned);
-
-        return cleaned;
+        return null;
     }
 
     public void disconnect() {

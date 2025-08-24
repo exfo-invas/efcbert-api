@@ -9,5 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class EventDisruptions {
     private TrafficResponse[] traffic;
-    private FrameLoss frameLoss;
+    private FrameLoss[] frameLoss;
+    private StandardTestResponse standard;
 }

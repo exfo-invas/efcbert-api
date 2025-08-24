@@ -7,10 +7,10 @@ import lombok.*;
 @NoArgsConstructor
 public class FrameLoss {
 
-    private String fcRate;
-    private int txCount;
-    private int rxCount;
-    private int lostFrames;
+    private String type;
+    private double byteCount;
+    private double frameRate;
+    private double frameCount;
     private double frameLossRate;
 
 }

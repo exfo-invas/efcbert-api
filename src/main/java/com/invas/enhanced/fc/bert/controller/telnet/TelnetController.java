@@ -5,7 +5,11 @@ import com.invas.enhanced.fc.bert.model.telnet.IPAddress;
 import com.invas.enhanced.fc.bert.service.telnet.TelnetService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -14,6 +18,12 @@ import org.springframework.web.bind.annotation.*;
 public class TelnetController {
 
     private final TelnetService telnetService;
+
+    @GetMapping("/ishealthy")
+    public ResponseEntity<Map<String, String>> getHealthy() {
+        log.info("Is Healthy");
+        return ResponseEntity.ok().body(Map.of("status", "UP"));
+    }
 
     @GetMapping("/connect/{ip}/{port}")
     public ConnectionResponse openConnection(@PathVariable String ip, @PathVariable int port) {

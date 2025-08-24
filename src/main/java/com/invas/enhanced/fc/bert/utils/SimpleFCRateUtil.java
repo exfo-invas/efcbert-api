@@ -17,7 +17,10 @@ public class SimpleFCRateUtil {
     );
 
     public static FcCalculationValues getLineUtilizationCommand(String fcRate) {
-        String fcRateValues = fcRates.get(fcRate);
+        if (fcRate == null) {
+            return null;
+        }
+        String fcRateValues = fcRates.get(fcRate.toLowerCase());
         if (fcRateValues != null) {
             String[] valuesStr = fcRateValues.split(",");
             double[] values = new double[valuesStr.length];

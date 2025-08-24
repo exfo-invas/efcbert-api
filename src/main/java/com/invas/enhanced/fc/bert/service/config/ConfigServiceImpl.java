@@ -1,5 +1,7 @@
 package com.invas.enhanced.fc.bert.service.config;
 
+import com.invas.enhanced.fc.bert.config.EventAggregatorConfig;
+import com.invas.enhanced.fc.bert.model.config.FullConfigStatus;
 import com.invas.enhanced.fc.bert.model.config.PortStatus;
 import com.invas.enhanced.fc.bert.model.config.PhysicalStatus;
 import com.invas.enhanced.fc.bert.model.config.ToolStatus;
@@ -18,11 +20,18 @@ public class ConfigServiceImpl implements ConfigService {
 
     private final ScpiTelnetService scpiTelnetService;
     private final EventService eventService;
+    private final EventAggregatorConfig eventAggregatorConfig;
 
     @Override
     public boolean testControl(boolean toggle) {
 
-        if(scpiTelnetService.sendCommand(ConfigScpiConst.controller(toggle? "START" : "STOP")).equalsIgnoreCase("true")) {
+        if (toggle) {
+            eventAggregatorConfig.setFullConfigStatus(getFullConfigStatus());
+        } else {
+            eventAggregatorConfig.setFullConfigStatus(null);
+        }
+
+        if (scpiTelnetService.sendCommand(ConfigScpiConst.controller(toggle ? "START" : "STOP")).equalsIgnoreCase("true")) {
             eventService.startScheduledEvent(toggle);
             log.info("Test control command executed successfully: {}", toggle ? "START" : "STOP");
             return true;
@@ -53,8 +62,21 @@ public class ConfigServiceImpl implements ConfigService {
     }
 
     @Override
-    public PhysicalStatus getPhysicalStatus() {        
+    public FullConfigStatus getFullConfigStatus() {
+        if (eventAggregatorConfig.getFullConfigStatus() != null){
+            return eventAggregatorConfig.getFullConfigStatus();
+        } else {
+            //Execute command to get status
+            return new FullConfigStatus(
+                    getPhysicalStatus(),
+                    getPortStatus(),
+                    getToolStatus(),
+                    getPSPLinkStatus()
+            );
+        }
+    }
 
+    public PhysicalStatus getPhysicalStatus() {
         //Execute command to get status
         return new PhysicalStatus(
                 scpiTelnetService.sendCommand(ConfigScpiConst.laserCntrl("STAT")),
@@ -72,9 +94,9 @@ public class ConfigServiceImpl implements ConfigService {
     public PortStatus getPortStatus() {
         //Execute command to get status
         return new PortStatus(
-            scpiTelnetService.sendCommand(ConfigScpiConst.toolStatus("FLOW-CONTROL")),
-            scpiTelnetService.sendCommand(ConfigScpiConst.toolStatus("CREDIT-STAT")),
-            scpiTelnetService.sendCommand(ConfigScpiConst.toolStatus("LOGGING-STAT"))
+                scpiTelnetService.sendCommand(ConfigScpiConst.toolStatus("FLOW-CONTROL")),
+                scpiTelnetService.sendCommand(ConfigScpiConst.toolStatus("CREDIT-STAT")),
+                scpiTelnetService.sendCommand(ConfigScpiConst.toolStatus("LOGGING-STAT"))
         );
     }
 

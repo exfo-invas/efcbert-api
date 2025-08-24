@@ -17,12 +17,7 @@ public class ConfigController {
 
     @GetMapping("/status/full")
     public FullConfigStatus getStatus() {
-        return new FullConfigStatus(
-                configService.getPhysicalStatus(),
-                configService.getPortStatus(),
-                configService.getToolStatus(),
-                configService.getPSPLinkStatus()
-        );
+        return configService.getFullConfigStatus();
     }
 
     @GetMapping("/laser/{toggle}")
@@ -32,7 +27,8 @@ public class ConfigController {
 
     @GetMapping("/test/{toggle}")
     public boolean toogleTest(@PathVariable boolean toggle) {
-         return configService.testControl(toggle);
+         /*return configService.testControl(toggle);*/
+        return true;
     }
 
     @GetMapping("/test/reset")
