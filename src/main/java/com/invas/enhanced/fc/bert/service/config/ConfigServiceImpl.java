@@ -1,6 +1,7 @@
 package com.invas.enhanced.fc.bert.service.config;
 
-import com.invas.enhanced.fc.bert.config.EventAggregatorConfig;
+import com.invas.enhanced.fc.bert.config.StandardConfig;
+import com.invas.enhanced.fc.bert.contants.EventScpiConst;
 import com.invas.enhanced.fc.bert.model.config.FullConfigStatus;
 import com.invas.enhanced.fc.bert.model.config.PortStatus;
 import com.invas.enhanced.fc.bert.model.config.PhysicalStatus;
@@ -20,20 +21,15 @@ public class ConfigServiceImpl implements ConfigService {
 
     private final ScpiTelnetService scpiTelnetService;
     private final EventService eventService;
-    private final EventAggregatorConfig eventAggregatorConfig;
+    private final StandardConfig standardConfig;
 
     @Override
     public boolean testControl(boolean toggle) {
 
-        if (toggle) {
-            eventAggregatorConfig.setFullConfigStatus(getFullConfigStatus());
-        } else {
-            eventAggregatorConfig.setFullConfigStatus(null);
-        }
-
         if (scpiTelnetService.sendCommand(ConfigScpiConst.controller(toggle ? "START" : "STOP")).equalsIgnoreCase("true")) {
             eventService.startScheduledEvent(toggle);
             log.info("Test control command executed successfully: {}", toggle ? "START" : "STOP");
+            log.info("Standard Config updated: Frame Size - {}, FC Rate - {}", standardConfig.getFrameSize(), standardConfig.getFcRate());
             return true;
         } else {
             log.error("Failed to execute test control command: {}", toggle ? "START" : "STOP");
@@ -63,17 +59,13 @@ public class ConfigServiceImpl implements ConfigService {
 
     @Override
     public FullConfigStatus getFullConfigStatus() {
-        if (eventAggregatorConfig.getFullConfigStatus() != null){
-            return eventAggregatorConfig.getFullConfigStatus();
-        } else {
-            //Execute command to get status
-            return new FullConfigStatus(
-                    getPhysicalStatus(),
-                    getPortStatus(),
-                    getToolStatus(),
-                    getPSPLinkStatus()
-            );
-        }
+        //Execute command to get status
+        return new FullConfigStatus(
+                getPhysicalStatus(),
+                getPortStatus(),
+                getToolStatus(),
+                getPSPLinkStatus()
+        );
     }
 
     public PhysicalStatus getPhysicalStatus() {

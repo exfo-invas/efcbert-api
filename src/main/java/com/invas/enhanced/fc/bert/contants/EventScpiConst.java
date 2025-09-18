@@ -67,6 +67,19 @@ public class EventScpiConst {
         return command;
     }
 
+    public static String latency(String type) {
+        String latencyCommand = "FIB:RTL:";
+        String command = switch (type.toUpperCase()) {
+            case "MAX" -> LINS_FETCH + latencyCommand + "MAX?";
+            case "MIN" -> LINS_FETCH + latencyCommand + "MIN?";
+            case "CURR" -> LINS_FETCH + latencyCommand + "CURR?";
+            case "LAST" -> LINS_FETCH + latencyCommand + "LAST?";
+            default -> "";
+        };
+        log.info("Latency CONTROL: {}", command);
+        return command;
+    }
+
 }
 
 

@@ -1,4 +1,4 @@
-package com.invas.enhanced.fc.bert.model.event.disruptions;
+package com.invas.enhanced.fc.bert.model.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,4 +11,5 @@ public class EventDisruptions {
     private TrafficResponse[] traffic;
     private FrameLoss[] frameLoss;
     private StandardTestResponse standard;
+    private LatencyResponse latency;
 }

@@ -56,6 +56,7 @@ public class ScpiTelnetService {
             while ((line = reader.readLine()) != null) {
                 if (line.isBlank()) continue;
                 response.append(line).append("\n");
+                log.info("in line {}", response);
                 if (line.toLowerCase().contains("ready") || line.toLowerCase().contains("module not present on slot 1")) {
                     break;
                 }
@@ -80,6 +81,7 @@ public class ScpiTelnetService {
         }
 
         if (response.contains("Connected")) {
+            log.info("response contains connected {}", response);
             return "true";
         }
 
@@ -87,6 +89,9 @@ public class ScpiTelnetService {
             return null;
         }
 
+        if (response.contains("Undefined header")) {
+            return null;
+        }
         final String prefix = "READY>";
         if (response.startsWith(prefix)) {
             String cleaned = response.substring(prefix.length()).trim();

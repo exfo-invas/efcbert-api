@@ -1,4 +1,4 @@
-package com.invas.enhanced.fc.bert.model.event.disruptions;
+package com.invas.enhanced.fc.bert.model.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,5 +7,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class StandardTestResponse {
     private String fcRate;
-    private double frameSize;
+    private String frameSize;
 }

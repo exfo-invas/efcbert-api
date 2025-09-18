@@ -1,12 +1,10 @@
 package com.invas.enhanced.fc.bert.service.event;
 
-import com.invas.enhanced.fc.bert.model.FcCalculationValues;
-import com.invas.enhanced.fc.bert.model.event.disruptions.EventDisruptions;
-import com.invas.enhanced.fc.bert.model.event.disruptions.FrameLoss;
-import com.invas.enhanced.fc.bert.model.event.disruptions.StandardTestResponse;
-import com.invas.enhanced.fc.bert.model.event.disruptions.TrafficResponse;
-import com.invas.enhanced.fc.bert.config.EventAggregatorConfig;
+import com.invas.enhanced.fc.bert.config.StandardConfig;
 import com.invas.enhanced.fc.bert.contants.ConfigScpiConst;
+import com.invas.enhanced.fc.bert.model.FcCalculationValues;
+import com.invas.enhanced.fc.bert.model.event.*;
+import com.invas.enhanced.fc.bert.config.EventAggregatorConfig;
 import com.invas.enhanced.fc.bert.contants.EventScpiConst;
 import com.invas.enhanced.fc.bert.service.ScpiTelnetService;
 import com.invas.enhanced.fc.bert.utils.SimpleFCRateUtil;
@@ -16,116 +14,137 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 @Slf4j
 @Service
 public class EventService {
 
     private final ScpiTelnetService scpiTelnetService;
     private final EventAggregatorConfig eventAggregatorConfig;
-
-    String fcRate = "";
-    double frameSize = 0;
+    private final StandardConfig standardConfig;
 
     private boolean scheduledEventEnabled = false;
 
-    public EventService(ScpiTelnetService scpiTelnetService, EventAggregatorConfig eventAggregatorConfig) {
+    public EventService(ScpiTelnetService scpiTelnetService, EventAggregatorConfig eventAggregatorConfig, StandardConfig standardConfig) {
         this.scpiTelnetService = scpiTelnetService;
         this.eventAggregatorConfig = eventAggregatorConfig;
+        this.standardConfig = standardConfig;
     }
 
-    /**
-     * Executes the event disruptions and returns the EventDisruptions object.
-     * This method retrieves the latest event disruptions data from the SCPI commands.
-     *
-     * @return EventDisruptions object containing the latest event disruptions data.
-     */
     public EventDisruptions executeEventDisruptions() {
         EventDisruptions eventDisruptions = new EventDisruptions();
 
-        if (fcRate.isEmpty() || frameSize == 0) {
+        // 1️⃣ Get FC rate and frame size from standardConfig or SCPI
+        String fcRate = standardConfig.getFcRate();
+        double frameSize = standardConfig.getFrameSize();
+
+        if (fcRate == null || frameSize == 0) {
             fcRate = scpiTelnetService.sendCommand(ConfigScpiConst.interfaceType("VALUE"));
             frameSize = Double.parseDouble(scpiTelnetService.sendCommand(EventScpiConst.frameSize()));
+            standardConfig.setFcRate(fcRate);
+            standardConfig.setFrameSize(frameSize);
         }
-        log.info("fcRate: {}, frameSize: {}", fcRate, frameSize);
 
-        String txByteCount = scpiTelnetService.sendCommand(EventScpiConst.byteCount("TX"));
-        String rxByteCount = scpiTelnetService.sendCommand(EventScpiConst.byteCount("RX"));
-        String txFrameCount = scpiTelnetService.sendCommand(EventScpiConst.frameCount("TX"));
-        String rxFrameCount = scpiTelnetService.sendCommand(EventScpiConst.frameCount("RX"));
-        String txFrameRate = scpiTelnetService.sendCommand(EventScpiConst.frameRate("TX"));
-        String rxFrameRate = scpiTelnetService.sendCommand(EventScpiConst.frameRate("RX"));
-        String txRateStr = scpiTelnetService.sendCommand(EventScpiConst.lineUtilization("TX"));
-        String rxRateStr = scpiTelnetService.sendCommand(EventScpiConst.lineUtilization("RX"));
-        if (txByteCount == null && rxByteCount == null && txRateStr == null && rxRateStr == null) {
-            log.error("Failed to retrieve TX or RX byte counts.");
+        eventDisruptions.setStandard(new StandardTestResponse(
+                fcRate,
+                BigDecimal.valueOf(frameSize).toPlainString()
+        ));
+
+        // 2️⃣ Retrieve TX/RX counts and rates
+        String txByteStr = scpiTelnetService.sendCommand(EventScpiConst.byteCount("TX"));
+        String rxByteStr = scpiTelnetService.sendCommand(EventScpiConst.byteCount("RX"));
+        String txFrameStr = scpiTelnetService.sendCommand(EventScpiConst.frameCount("TX"));
+        String rxFrameStr = scpiTelnetService.sendCommand(EventScpiConst.frameCount("RX"));
+        String txFrameRateStr = scpiTelnetService.sendCommand(EventScpiConst.frameRate("TX"));
+        String rxFrameRateStr = scpiTelnetService.sendCommand(EventScpiConst.frameRate("RX"));
+        String txUtilStr = scpiTelnetService.sendCommand(EventScpiConst.lineUtilization("TX"));
+        String rxUtilStr = scpiTelnetService.sendCommand(EventScpiConst.lineUtilization("RX"));
+
+        if (txByteStr == null || rxByteStr == null || txUtilStr == null || rxUtilStr == null) {
+            log.error("Failed to retrieve TX or RX data.");
             return null;
         }
-        assert txByteCount != null;
-        double txCount = Double.parseDouble(txFrameCount);
-        double rxCount = Double.parseDouble(rxFrameCount);
-        double txByteCountDouble = Double.parseDouble(txByteCount);
-        double rxByteCountDouble = Double.parseDouble(rxByteCount);
-        double txFrameRateDouble = Double.parseDouble(txFrameRate);
-        double rxFrameRateDouble = Double.parseDouble(rxFrameRate);
-        double lostFrames = txCount - rxCount;
-        double frameLossRate = (lostFrames / txCount * 100) < 2.0 ? 0 : lostFrames / txCount * 100;
 
-        FrameLoss[] frameLoss = new FrameLoss[2];
-        frameLoss[0] = new FrameLoss(
-                "TX",
-                txByteCountDouble,
-                txFrameRateDouble,
-                txCount,
-                frameLossRate);
-        frameLoss[1] = new FrameLoss(
-                "RX",
-                rxByteCountDouble,
-                rxFrameRateDouble,
-                rxCount,
-                frameLossRate
-        );
+        // 3️⃣ Convert counts and rates to BigDecimal
+        BigDecimal txCount = new BigDecimal(txFrameStr);
+        BigDecimal rxCount = new BigDecimal(rxFrameStr);
+        BigDecimal lostFrames = txCount.subtract(rxCount);
+        BigDecimal frameLossRate = percentageOfBigDecimal(lostFrames, txCount);
+
+        // Apply minimum threshold and round to 2 decimals
+        frameLossRate = frameLossRate.compareTo(BigDecimal.valueOf(2.0)) < 0
+                ? BigDecimal.ZERO
+                : frameLossRate.setScale(2, RoundingMode.HALF_UP);
+
+        FrameLoss[] frameLoss = {
+                new FrameLoss("TX", new BigDecimal(txByteStr), new BigDecimal(txFrameRateStr), txCount, frameLossRate),
+                new FrameLoss("RX", new BigDecimal(rxByteStr), new BigDecimal(rxFrameRateStr), rxCount, frameLossRate)
+        };
         eventDisruptions.setFrameLoss(frameLoss);
 
+        // 4️⃣ Calculate utilization & throughput
+        BigDecimal currentUtilTX = new BigDecimal(txUtilStr);
+        BigDecimal currentUtilRX = new BigDecimal(rxUtilStr);
 
-        // Calculate current utilization based on the frame size and byte count
-        double currentUtilizationTX = Double.parseDouble(txRateStr);
-        double currentUtilizationRX = Double.parseDouble(rxRateStr);
-        log.info("getting FcCalculationValues for fcRate: {}", fcRate);
-        FcCalculationValues fcCalculationValues = SimpleFCRateUtil.getLineUtilizationCommand(fcRate);
-        if (fcCalculationValues == null) {
-            log.error("Invalid fcRate: {}", fcRate);
+        FcCalculationValues fcValues = SimpleFCRateUtil.getLineUtilizationCommand(standardConfig.getFcRate());
+        if (fcValues == null) {
+            log.error("Invalid fcRate: {}", standardConfig.getFcRate());
             return null;
         }
-        log.info("FcCalculationValues: {}", fcCalculationValues);
-        double MessuredThroughputTx = fcCalculationValues.getActualThroughput() * (currentUtilizationTX / 100);
-        double MessuredThroughputRx = fcCalculationValues.getActualThroughput() * (currentUtilizationRX / 100);
-        log.info("Measured Throughput TX: {}, RX: {}", MessuredThroughputTx, MessuredThroughputRx);
-        double transferSpeedTx = fcCalculationValues.getActualTransferRate() * (currentUtilizationTX / 100);
-        double transferSpeedRx = fcCalculationValues.getActualTransferRate() * (currentUtilizationRX / 100);
-        log.info("Transfer Speed TX: {}, RX: {}", transferSpeedTx, transferSpeedRx);
-        double lineSpeedTx = fcCalculationValues.getLineSpeed() * (currentUtilizationTX / 100);
-        double lineSpeedRx = fcCalculationValues.getLineSpeed() * (currentUtilizationRX / 100);
-        log.info("Line Speed TX: {}, RX: {}", lineSpeedTx, lineSpeedRx);
-        TrafficResponse[] trafficResponses = new TrafficResponse[2];
-        trafficResponses[0] = new TrafficResponse(
-                "TX",
-                currentUtilizationTX,
-                MessuredThroughputTx,
-                transferSpeedTx,
-                lineSpeedTx
-        );
-        trafficResponses[1] = new TrafficResponse(
-                "RX",
-                currentUtilizationRX,
-                MessuredThroughputRx,
-                transferSpeedRx,
-                lineSpeedRx
-        );
+
+        BigDecimal actualThroughput = BigDecimal.valueOf(fcValues.getActualThroughput());
+        BigDecimal actualTransferRate = BigDecimal.valueOf(fcValues.getActualTransferRate());
+        BigDecimal actualLineSpeed = BigDecimal.valueOf(fcValues.getLineSpeed());
+
+        BigDecimal measuredThroughputTX = percentageOfBigDecimal(actualThroughput, currentUtilTX);
+        BigDecimal measuredThroughputRX = percentageOfBigDecimal(actualThroughput, currentUtilRX);
+
+        BigDecimal transferSpeedTX = percentageOfBigDecimal(actualTransferRate, currentUtilTX);
+        BigDecimal transferSpeedRX = percentageOfBigDecimal(actualTransferRate, currentUtilRX);
+
+        BigDecimal lineSpeedTX = percentageOfBigDecimal(actualLineSpeed, currentUtilTX);
+        BigDecimal lineSpeedRX = percentageOfBigDecimal(actualLineSpeed, currentUtilRX);
+
+        TrafficResponse[] trafficResponses = {
+                new TrafficResponse("TX", currentUtilTX, measuredThroughputTX, transferSpeedTX, lineSpeedTX),
+                new TrafficResponse("RX", currentUtilRX, measuredThroughputRX, transferSpeedRX, lineSpeedRX)
+        };
         eventDisruptions.setTraffic(trafficResponses);
-        eventDisruptions.setStandard(new StandardTestResponse(fcRate, frameSize));
+
+        // 5️⃣ Set latency
+        eventDisruptions.setLatency(getLatency());
+
         log.info("EventDisruptions: {}", eventDisruptions);
         return eventDisruptions;
-    }    
+    }
+
+
+    private BigDecimal percentageOfBigDecimal(BigDecimal part, BigDecimal total) {
+        if (total.compareTo(BigDecimal.ZERO) == 0) {
+            return BigDecimal.ZERO;
+        }
+        return part.multiply(BigDecimal.valueOf(100)).divide(total, 10, RoundingMode.HALF_UP);
+    }
+
+    private LatencyResponse getLatency() {
+        String current = scpiTelnetService.sendCommand(EventScpiConst.latency("CURR"));
+        String last = scpiTelnetService.sendCommand(EventScpiConst.latency("LAST"));
+        String min = scpiTelnetService.sendCommand(EventScpiConst.latency("MIN"));
+        String max = scpiTelnetService.sendCommand(EventScpiConst.latency("MAX"));
+        if (current == null && last == null && min == null && max == null) {
+            log.error("Failed to retrieve latency data.");
+            return null;
+        }
+        assert current != null;
+        return new LatencyResponse(
+                new BigDecimal(current),
+                new BigDecimal(last),
+                new BigDecimal(min),
+                new BigDecimal(max)
+        );
+    }
 
     public void startScheduledEvent(boolean enabled) {
         scheduledEventEnabled = enabled;
@@ -145,7 +164,7 @@ public class EventService {
         }
     }
 
-    @Scheduled(fixedRate = 3600000) // runs every hour
+    @Scheduled(fixedRate = 1000) //TODO: 3600000 runs every hour
     private void hourlyEventDisruptions() {
         if (!scheduledEventEnabled) {
             return;
@@ -153,4 +172,6 @@ public class EventService {
         log.info("Hourly event disruptions execution...");
         eventAggregatorConfig.updateHourlyEventDisruptions();
     }
+
+
 }
