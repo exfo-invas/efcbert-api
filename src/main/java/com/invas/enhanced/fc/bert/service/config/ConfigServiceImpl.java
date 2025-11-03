@@ -7,6 +7,7 @@ import com.invas.enhanced.fc.bert.model.config.PortStatus;
 import com.invas.enhanced.fc.bert.model.config.PhysicalStatus;
 import com.invas.enhanced.fc.bert.model.config.ToolStatus;
 import com.invas.enhanced.fc.bert.contants.ConfigScpiConst;
+import com.invas.enhanced.fc.bert.model.event.StandardTestResponse;
 import com.invas.enhanced.fc.bert.service.ScpiTelnetService;
 import com.invas.enhanced.fc.bert.service.event.EventService;
 
