@@ -69,14 +69,25 @@ public class ConfigServiceImpl implements ConfigService {
     }
 
     public PhysicalStatus getPhysicalStatus() {
-        //Execute command to get status
+        String fcRate = this.scpiTelnetService.sendCommand(ConfigScpiConst.interfaceType("VALUE"));
+        String frameSize = this.scpiTelnetService.sendCommand(EventScpiConst.frameSize());
+        if (fcRate == null || frameSize == null) {
+            log.error("Failed to retrieve FC Rate or Frame Size.");
+            return null;
+        } else {
+            this.standardConfig.setStandardTestResponse(
+                    new StandardTestResponse(
+                            fcRate,
+                            frameSize
+                    )
+            );
+        }
         return new PhysicalStatus(
-                scpiTelnetService.sendCommand(ConfigScpiConst.laserCntrl("STAT")),
-                scpiTelnetService.sendCommand(ConfigScpiConst.interfaceType("VALUE")),
-                scpiTelnetService.sendCommand(ConfigScpiConst.physicalPort("STATUS")),
-                scpiTelnetService.sendCommand(ConfigScpiConst.consoleOuput("TX")),
-                scpiTelnetService.sendCommand(ConfigScpiConst.consoleOuput("RX"))
-        );
+                this.scpiTelnetService.sendCommand(ConfigScpiConst.laserCntrl("STAT")),
+                fcRate,
+                this.scpiTelnetService.sendCommand(ConfigScpiConst.physicalPort("STATUS")),
+                this.scpiTelnetService.sendCommand(ConfigScpiConst.consoleOuput("TX")),
+                this.scpiTelnetService.sendCommand(ConfigScpiConst.consoleOuput("RX")));
     }
 
     public String laserControl(boolean type) {
