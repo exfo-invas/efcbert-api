@@ -10,7 +10,6 @@ import java.math.BigDecimal;
 @Setter
 @AllArgsConstructor
 public class LatencyResponse {
-    private BigDecimal current;
     private BigDecimal last;
     private BigDecimal min;
     private BigDecimal max;
