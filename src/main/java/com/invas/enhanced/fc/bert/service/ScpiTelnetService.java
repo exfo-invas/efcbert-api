@@ -86,21 +86,23 @@ public class ScpiTelnetService {
         }
 
         if (response.contains("Connection is not established")) {
+            log.info("response contains connection is not established {}", response);
             return null;
         }
 
         if (response.contains("Undefined header")) {
+            log.info("Undefined header found in response {}", response);
             return null;
         }
         final String prefix = "READY>";
         if (response.startsWith(prefix)) {
+            log.info("Sanitizing response: {}", response);
             String cleaned = response.substring(prefix.length()).trim();
             if (!cleaned.toLowerCase().contains("error")) {
                 log.info("Sanitized response: {}", cleaned);
                 return cleaned;
             }
         }
-
         return null;
     }
 
