@@ -118,4 +118,8 @@ public class ConfigServiceImpl implements ConfigService {
     public String getPSPLinkStatus() {
         return scpiTelnetService.sendCommand(ConfigScpiConst.pspLink("LINK"));
     }
+
+    private void getloggingList() {
+    String logg = this.scpiTelnetService.sendCommand(EventScpiConst.loggingList());
+  }
 }
