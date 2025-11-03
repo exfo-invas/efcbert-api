@@ -45,7 +45,7 @@ public class EventService {
             this.standardConfig.setStandardTestResponse(standardTestResponse);
         } else {
             String frameSize = this.scpiTelnetService.sendCommand(EventScpiConst.frameSize());
-            if (!standardTestResponse.getFrameSize().equals(frameSize)) {
+            if (!standardTestResponse.getFrameSize().equals(frameSize == null ? "" : frameSize)) {
                 standardTestResponse.setFrameSize(frameSize);
             }
         }
