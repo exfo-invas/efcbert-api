@@ -82,7 +82,7 @@ public class EventScpiConst {
 
     public static String loggingList() {
         log.info("Logging List CONTROL: {}", "LINS1:FETC:DATA:TEL:LOGG:LIST?");
-        return "LINS1:FETC:DATA:TEL:LOGG:LIST?";
+        return LOGGING_LIST;
     }
 
 }

@@ -110,7 +110,7 @@ public class EventService {
         String last = this.scpiTelnetService.sendCommand(EventScpiConst.latency("LAST"));
         String min = this.scpiTelnetService.sendCommand(EventScpiConst.latency("MIN"));
         String max = this.scpiTelnetService.sendCommand(EventScpiConst.latency("MAX"));
-        log.info("last {}, min {}, max {}: Latency", new Object[]{last, min, max});
+        log.info("last {}, min {}, max {}: Latency", last, min, max);
         return new LatencyResponse(ifNullReturnZero(last), ifNullReturnZero(min), ifNullReturnZero(max));
     }
 
