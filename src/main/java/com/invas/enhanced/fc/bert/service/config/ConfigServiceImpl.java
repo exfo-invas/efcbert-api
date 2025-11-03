@@ -29,7 +29,9 @@ public class ConfigServiceImpl implements ConfigService {
         if (scpiTelnetService.sendCommand(ConfigScpiConst.controller(toggle ? "START" : "STOP")).equalsIgnoreCase("true")) {
             eventService.startScheduledEvent(toggle);
             log.info("Test control command executed successfully: {}", toggle ? "START" : "STOP");
-            log.info("Standard Config updated: Frame Size - {}, FC Rate - {}", standardConfig.getFrameSize(), standardConfig.getFcRate());
+            if (!toggle) {
+                getloggingList();
+            }
             return true;
         } else {
             log.error("Failed to execute test control command: {}", toggle ? "START" : "STOP");
