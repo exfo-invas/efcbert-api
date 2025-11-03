@@ -54,7 +54,7 @@ public class EventAggregatorConfig {
                 getLatestEventDisruption().getTraffic()[1].getCurrentUtilization().toPlainString(),
                 getLatestEventDisruption().getTraffic()[1].getMeasuredThroughput().toPlainString(),
                 getLatestEventDisruption().getFrameLoss()[1].getFrameLossRate().toPlainString(),
-                getLatestEventDisruption().getLatency().getCurrent().toPlainString()
+                getLatestEventDisruption().getLatency().getLast().toPlainString()
         );
         if (hourlyEventMap.isEmpty()) {
             log.info("Creating new hourly event disruptions map.");
