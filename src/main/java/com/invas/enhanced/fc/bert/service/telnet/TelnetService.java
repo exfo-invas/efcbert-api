@@ -5,7 +5,7 @@ import com.invas.enhanced.fc.bert.model.telnet.IPAddress;
 
 public interface TelnetService {
 
-    ConnectionResponse getConnection(String localIpaddress, int port);
+    ConnectionResponse getConnection(String localIpaddress);
 
     String disconnect();
 

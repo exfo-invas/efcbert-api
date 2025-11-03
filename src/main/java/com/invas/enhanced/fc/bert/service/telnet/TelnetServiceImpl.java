@@ -17,8 +17,8 @@ public class TelnetServiceImpl implements TelnetService {
     private final FetchIPAddress fetchIPAddress;
 
     @Override
-    public ConnectionResponse getConnection(String localIpaddress, int port) {
-        boolean connected = scpiTelnetService.getConnection(localIpaddress, port);
+    public ConnectionResponse getConnection(String localIpaddress) {
+        boolean connected = scpiTelnetService.getConnection(localIpaddress, 5024);
 
         return new ConnectionResponse(
                 connected,
