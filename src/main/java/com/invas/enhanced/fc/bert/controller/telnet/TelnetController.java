@@ -25,9 +25,9 @@ public class TelnetController {
         return ResponseEntity.ok().body(Map.of("status", "UP"));
     }
 
-    @GetMapping("/connect/{ip}/{port}")
-    public ConnectionResponse openConnection(@PathVariable String ip, @PathVariable int port) {
-        ConnectionResponse telnet = telnetService.getConnection(ip, port);
+    @GetMapping("/connect/{ip}")
+    public ConnectionResponse openConnection(@PathVariable String ip) {
+        ConnectionResponse telnet = telnetService.getConnection(ip);
         log.info("TelnetController get connection {}", telnet);
         return telnet;
     }
