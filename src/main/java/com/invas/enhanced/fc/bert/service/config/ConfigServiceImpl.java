@@ -122,5 +122,6 @@ public class ConfigServiceImpl implements ConfigService {
 
     private void getloggingList() {
     String logg = this.scpiTelnetService.sendCommand(EventScpiConst.loggingList());
+    log.info("Logging List: {}", logg);
   }
 }
