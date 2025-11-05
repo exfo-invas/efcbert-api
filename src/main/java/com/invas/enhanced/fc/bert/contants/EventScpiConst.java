@@ -56,7 +56,7 @@ public class EventScpiConst {
     }
 
     public static String frameSize() {
-        String command = LINS_FETCH + FIBER_STRING + "SIZE?";
+        String command = LINS_SOURCE + FIBER_STRING + "SIZE?";
         log.info("Frame Size CONTROL: {}", command);
         return command;
     }

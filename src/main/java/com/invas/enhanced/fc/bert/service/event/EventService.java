@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 @Service
@@ -26,6 +27,8 @@ public class EventService {
     private final StandardConfig standardConfig;
 
     private boolean scheduledEventEnabled = false;
+    // thread-safe counter incremented by the secondly scheduled task
+    private final AtomicInteger secondsCounter = new AtomicInteger(0);
 
     public EventService(ScpiTelnetService scpiTelnetService, EventAggregatorConfig eventAggregatorConfig, StandardConfig standardConfig) {
         this.scpiTelnetService = scpiTelnetService;
@@ -98,6 +101,10 @@ public class EventService {
         eventDisruptions.setLatency(getLatency());
         log.info("****Updated latency in eventDisruptions***");
         log.info("EventDisruptions: {}", eventDisruptions);
+        boolean readyForHourly = secondsCounter.get() == 3600;
+        eventDisruptions.setHourlyStatus(
+                new HourlyCounter(secondsCounter.get(), readyForHourly)
+        );
         return eventDisruptions;
     }
 
@@ -122,19 +129,30 @@ public class EventService {
         this.scheduledEventEnabled = enabled;
     }
 
-    @Scheduled(fixedRate = 1000L)
+    @Scheduled(fixedRate = 1000L) // every second
     private void secondlyEventDisruption() {
         if (!this.scheduledEventEnabled) {
             log.info("EventDisruptions not enabled");
             return;
         }
         log.info("Scheduling event disruptions execution...");
+        // increment the seconds counter; when it reaches 60 trigger hourly aggregation
+        int seconds = this.secondsCounter.incrementAndGet();
+        if (seconds >= 3600) { // every hour
+            // reset and call hourly aggregation
+            this.secondsCounter.set(0);
+            try {
+                hourlyEventDisruptions();
+            } catch (Exception e) {
+                log.error("Error while executing hourlyEventDisruptions from secondlyEventDisruption", e);
+            }
+        }
+
         EventDisruptions eventDisruptions = executeEventDisruptions();
         log.info("EventDisruptions: {} to update EventList", eventDisruptions);
         if (eventDisruptions != null) this.eventAggregatorConfig.updateEventDisruptionsList(eventDisruptions);
     }
 
-    @Scheduled(fixedRate = 1000L)
     private void hourlyEventDisruptions() {
         if (!this.scheduledEventEnabled) return;
         log.info("Hourly event disruptions execution...");

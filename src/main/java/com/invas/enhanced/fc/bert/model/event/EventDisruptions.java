@@ -12,4 +12,5 @@ public class EventDisruptions {
     private FrameLoss[] frameLoss;
     private StandardTestResponse standard;
     private LatencyResponse latency;
+    private HourlyCounter hourlyStatus;
 }
