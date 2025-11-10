@@ -1,9 +1,11 @@
 package com.invas.enhanced.fc.bert.config;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.invas.enhanced.fc.bert.model.event.HourlyEvent;
+import com.invas.enhanced.fc.bert.utils.FileExporter;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.annotation.Configuration;
@@ -66,5 +68,15 @@ public class EventAggregatorConfig {
             hourlyEventMap.put(hourlyEventMap.size() + 1, hourlyEvent);
         }
         return hourlyEventMap;
+    }
+
+    public void generateExportFile() {
+        log.info("Generating export file for event disruptions...");
+        // Implementation for file generation goes here
+        FileExporter.exportEventDisruptionsToCsv(eventDisruptionsList);
+        FileExporter.exportHourlyEventsToCsv(getHourlyEventList());
+        //Clear lists after exporting
+        eventDisruptionsList.clear();
+        hourlyEventMap.clear();
     }
 }

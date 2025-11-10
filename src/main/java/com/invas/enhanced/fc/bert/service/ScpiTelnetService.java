@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -62,7 +63,7 @@ public class ScpiTelnetService {
                 }
             }
             log.info("Command sent: {}, Response: {}", command, response);
-            return sanitizeResponse(response.toString());
+            return sanitizeResponse(response.toString(), command);
         } catch (Exception e) {
             log.error("Error during command execution: {}", e.getMessage(), e);
             return "Failed to send command";
@@ -75,7 +76,7 @@ public class ScpiTelnetService {
      * - Ignores response if it contains "error" (case-insensitive)
      * - Returns cleaned data if valid, otherwise null
      */
-    private String sanitizeResponse(String response) {
+    private String sanitizeResponse(String response, String command) {
         if (response == null || response.isBlank()) {
             return null;
         }
@@ -88,6 +89,13 @@ public class ScpiTelnetService {
         if (response.contains("Connection is not established")) {
             log.info("response contains connection is not established {}", response);
             return null;
+        }
+
+        if (Objects.equals(command, "LINS1:SOUR:DATA:TEL:TEST OFF")) {
+            log.info("response for LINS1:SOUR:DATA:TEL:TEST OFF {}", response);
+            if (response.contains("This operation may take few minutes to complete.") || response.contains("Please wait for a while.")) {
+                return "true";
+            }
         }
 
         if (response.contains("Undefined header")) {

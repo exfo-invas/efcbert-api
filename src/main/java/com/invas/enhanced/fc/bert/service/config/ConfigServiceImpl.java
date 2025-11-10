@@ -1,5 +1,6 @@
 package com.invas.enhanced.fc.bert.service.config;
 
+import com.invas.enhanced.fc.bert.config.EventAggregatorConfig;
 import com.invas.enhanced.fc.bert.config.StandardConfig;
 import com.invas.enhanced.fc.bert.contants.EventScpiConst;
 import com.invas.enhanced.fc.bert.model.config.FullConfigStatus;
@@ -7,13 +8,19 @@ import com.invas.enhanced.fc.bert.model.config.PortStatus;
 import com.invas.enhanced.fc.bert.model.config.PhysicalStatus;
 import com.invas.enhanced.fc.bert.model.config.ToolStatus;
 import com.invas.enhanced.fc.bert.contants.ConfigScpiConst;
+import com.invas.enhanced.fc.bert.model.event.EventDisruptions;
+import com.invas.enhanced.fc.bert.model.event.FrameLoss;
 import com.invas.enhanced.fc.bert.model.event.StandardTestResponse;
+import com.invas.enhanced.fc.bert.model.event.TrafficResponse;
 import com.invas.enhanced.fc.bert.service.ScpiTelnetService;
 import com.invas.enhanced.fc.bert.service.event.EventService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
 
 @Slf4j
 @Service
@@ -23,6 +30,7 @@ public class ConfigServiceImpl implements ConfigService {
     private final ScpiTelnetService scpiTelnetService;
     private final EventService eventService;
     private final StandardConfig standardConfig;
+    private final EventAggregatorConfig eventAggregatorConfig;
 
     @Override
     public boolean testControl(boolean toggle) {
@@ -122,6 +130,7 @@ public class ConfigServiceImpl implements ConfigService {
 
     private void getloggingList() {
     String logg = this.scpiTelnetService.sendCommand(EventScpiConst.loggingList());
+    eventAggregatorConfig.generateExportFile();
     log.info("Logging List: {}", logg);
   }
 }

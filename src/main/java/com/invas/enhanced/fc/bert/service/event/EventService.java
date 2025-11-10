@@ -127,6 +127,7 @@ public class EventService {
 
     public void startScheduledEvent(boolean enabled) {
         this.scheduledEventEnabled = enabled;
+        this.eventAggregatorConfig.generateExportFile();
     }
 
     @Scheduled(fixedRate = 1000L) // every second
