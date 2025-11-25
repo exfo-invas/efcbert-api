@@ -72,8 +72,16 @@ public class EventService {
         BigDecimal frameLossRate = percentageOfBigDecimal(lostFrames, txCount);
         frameLossRate = (frameLossRate.compareTo(BigDecimal.valueOf(2.0D)) < 0) ? BigDecimal.ZERO : frameLossRate.setScale(2, RoundingMode.HALF_UP);
         FrameLoss[] frameLoss = {
-                new FrameLoss("Tx", ifNullReturnZero(txByteStr), ifNullReturnZero(txFrameRateStr), txCount, frameLossRate),
-                new FrameLoss("Rx", ifNullReturnZero(rxByteStr), ifNullReturnZero(rxFrameRateStr), rxCount, frameLossRate)
+                new FrameLoss("Tx",
+                        roundToTwoDecimalPlaces(ifNullReturnZero(txByteStr)),
+                        roundToTwoDecimalPlaces(ifNullReturnZero(txFrameRateStr)),
+                        roundToTwoDecimalPlaces(txCount),
+                        frameLossRate),
+                new FrameLoss("Rx",
+                        roundToTwoDecimalPlaces(ifNullReturnZero(rxByteStr)),
+                        roundToTwoDecimalPlaces(ifNullReturnZero(rxFrameRateStr)),
+                        roundToTwoDecimalPlaces(rxCount),
+                        frameLossRate)
         };
         eventDisruptions.setFrameLoss(frameLoss);
         log.info("****Updated frameLossRate: {} in eventDisruptions***", frameLossRate);
@@ -94,14 +102,21 @@ public class EventService {
         BigDecimal lineSpeedTX = percentageOfBigDecimal(actualLineSpeed, currentUtilTX);
         BigDecimal lineSpeedRX = percentageOfBigDecimal(actualLineSpeed, currentUtilRX);
         TrafficResponse[] trafficResponses = {
-                new TrafficResponse("Tx", currentUtilTX, measuredThroughputTX, transferSpeedTX, lineSpeedTX),
-                new TrafficResponse("Rx", currentUtilRX, measuredThroughputRX, transferSpeedRX, lineSpeedRX)};
+                new TrafficResponse("Tx",
+                        roundToTwoDecimalPlaces(currentUtilTX),
+                        roundToTwoDecimalPlaces(measuredThroughputTX),
+                        roundToTwoDecimalPlaces(transferSpeedTX),
+                        roundToTwoDecimalPlaces(lineSpeedTX)),
+                new TrafficResponse("Rx", roundToTwoDecimalPlaces(currentUtilRX),
+                        roundToTwoDecimalPlaces(measuredThroughputRX),
+                        roundToTwoDecimalPlaces(transferSpeedRX),
+                        roundToTwoDecimalPlaces(lineSpeedRX))};
         eventDisruptions.setTraffic(trafficResponses);
         log.info("****Updated trafficResponses: {} in eventDisruptions****", (Object) trafficResponses);
         eventDisruptions.setLatency(getLatency());
         log.info("****Updated latency in eventDisruptions***");
         log.info("EventDisruptions: {}", eventDisruptions);
-        boolean readyForHourly = secondsCounter.get() == 3600;
+
         eventDisruptions.setHourlyStatus(
                 new HourlyCounter(secondsCounter.get(), readyForHourly)
         );
@@ -110,7 +125,12 @@ public class EventService {
 
     private BigDecimal percentageOfBigDecimal(BigDecimal part, BigDecimal total) {
         if (total.compareTo(BigDecimal.ZERO) == 0) return BigDecimal.ZERO;
-        return part.multiply(BigDecimal.valueOf(100L)).divide(total, 10, RoundingMode.HALF_UP);
+        // new calculation: part * (total / 100)
+        return part.multiply(total).divide(BigDecimal.valueOf(100L), 10, RoundingMode.HALF_UP);
+    }
+
+    private BigDecimal roundToTwoDecimalPlaces(BigDecimal value) {
+        return value.setScale(2, RoundingMode.HALF_UP);
     }
 
     private LatencyResponse getLatency() {
