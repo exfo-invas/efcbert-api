@@ -23,9 +23,9 @@ public class FileExporter {
      * frameLoss[1].frameLossRate, latency.last
      */
     public static void exportEventDisruptionsToCsv(List<EventDisruptions> eventDisruptionsList) {
-        Path filePath = null;
+        Path filePath;
         try {
-            filePath = getDefaultCsvPath("event_disruptions");
+            filePath = getDefaultCsvPath("full_event");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -71,9 +71,9 @@ public class FileExporter {
      * Columns: no,utilization,throughput,frameLoss,latency
      */
     public static void exportHourlyEventsToCsv(List<HourlyEvent> hourlyEventList) {
-        Path filePath = null;
+        Path filePath;
         try {
-            filePath = getDefaultCsvPath("hourly_events");
+            filePath = getDefaultCsvPath("consolidated_events");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -113,7 +113,8 @@ public class FileExporter {
     // Helper: create timestamped path on Desktop/EnhancedFCBert/
     private static Path getDefaultCsvPath(String prefix) throws IOException {
         String userHome = System.getProperty("user.home");
-        Path folder = Paths.get(userHome, "Desktop", "EnhancedFCBert");
+        String dateFolder = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
+        Path folder = Paths.get(userHome, "Desktop", "EnhancedFcbert", dateFolder);
         if (!Files.exists(folder)) {
             Files.createDirectories(folder);
         }
