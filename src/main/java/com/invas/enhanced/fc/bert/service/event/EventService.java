@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 @Service
@@ -29,6 +30,12 @@ public class EventService {
     private boolean scheduledEventEnabled = false;
     // thread-safe counter incremented by the secondly scheduled task
     private final AtomicInteger secondsCounter = new AtomicInteger(0);
+
+    private final AtomicLong lastHourlyRunNano = new AtomicLong(System.nanoTime());
+
+    private boolean readyForHourly = false;
+
+    private static final long ONE_HOUR_NANO = 3_600_000_000_000L;
 
     public EventService(ScpiTelnetService scpiTelnetService, EventAggregatorConfig eventAggregatorConfig, StandardConfig standardConfig) {
         this.scpiTelnetService = scpiTelnetService;
@@ -159,15 +166,33 @@ public class EventService {
         log.info("Scheduling event disruptions execution...");
         // increment the seconds counter; when it reaches 60 trigger hourly aggregation
         int seconds = this.secondsCounter.incrementAndGet();
-        if (seconds >= 3600) { // every hour
-            // reset and call hourly aggregation
-            this.secondsCounter.set(0);
-            try {
-                hourlyEventDisruptions();
-            } catch (Exception e) {
-                log.error("Error while executing hourlyEventDisruptions from secondlyEventDisruption", e);
+
+        long now = System.nanoTime();
+        long last = lastHourlyRunNano.get();
+
+        if (now - last >= ONE_HOUR_NANO) {
+            log.info("One hour has passed since last hourly run. Triggering hourlyEventDisruptions...");
+            readyForHourly = true;
+            // atomically acquire the hourly tick
+            if (lastHourlyRunNano.compareAndSet(last, now)) {
+                log.info("Executing hourlyEventDisruptions due to one hour elapsed...");
+                try {
+                    hourlyEventDisruptions();
+                } catch (Exception e) {
+                    log.error("Error in hourlyEventDisruptions", e);
+                }
             }
         }
+
+//        if (seconds >= 3600) { // every hour
+//            // reset and call hourly aggregation
+//            this.secondsCounter.set(0);
+//            try {
+//                hourlyEventDisruptions();
+//            } catch (Exception e) {
+//                log.error("Error while executing hourlyEventDisruptions from secondlyEventDisruption", e);
+//            }
+//        }
 
         EventDisruptions eventDisruptions = executeEventDisruptions();
         log.info("EventDisruptions: {} to update EventList", eventDisruptions);
