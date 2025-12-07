@@ -37,8 +37,6 @@ public class EventService {
 
     private boolean readyForHourly = false;
 
-    private static final long ONE_HOUR_NANO = 3_600_000_000_000L;
-
     public EventService(ScpiTelnetService scpiTelnetService, EventAggregatorConfig eventAggregatorConfig, StandardConfig standardConfig) {
         this.scpiTelnetService = scpiTelnetService;
         this.eventAggregatorConfig = eventAggregatorConfig;
