@@ -7,17 +7,19 @@ import com.invas.enhanced.fc.bert.model.event.*;
 import com.invas.enhanced.fc.bert.config.EventAggregatorConfig;
 import com.invas.enhanced.fc.bert.contants.EventScpiConst;
 import com.invas.enhanced.fc.bert.service.ScpiTelnetService;
+import com.invas.enhanced.fc.bert.utils.DecimalHandlerUtil;
 import com.invas.enhanced.fc.bert.utils.SimpleFCRateUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
