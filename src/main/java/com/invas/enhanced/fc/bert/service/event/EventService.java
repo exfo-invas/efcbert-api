@@ -76,7 +76,7 @@ public class EventService {
         BigDecimal txCount = DecimalHandlerUtil.ifNullReturnZero(txFrameStr);
         BigDecimal rxCount = DecimalHandlerUtil.ifNullReturnZero(rxFrameStr);
         BigDecimal lostFrames = txCount.subtract(rxCount);
-        BigDecimal frameLossRate = percentageOfBigDecimal(lostFrames, txCount);
+        BigDecimal frameLossRate = DecimalHandlerUtil.percentageOfBigDecimal(lostFrames, txCount);
         frameLossRate = (frameLossRate.compareTo(BigDecimal.valueOf(2.0D)) < 0) ? BigDecimal.ZERO : frameLossRate;
         FrameLoss[] frameLoss = {
                 new FrameLoss("Tx",
@@ -102,12 +102,12 @@ public class EventService {
         BigDecimal actualThroughput = BigDecimal.valueOf(fcValues.getActualThroughput());
         BigDecimal actualTransferRate = BigDecimal.valueOf(fcValues.getActualTransferRate());
         BigDecimal actualLineSpeed = BigDecimal.valueOf(fcValues.getLineSpeed());
-        BigDecimal measuredThroughputTX = valuePercentage(actualThroughput, currentUtilTX);
-        BigDecimal measuredThroughputRX = valuePercentage(actualThroughput, currentUtilRX);
-        BigDecimal transferSpeedTX = valuePercentage(actualTransferRate, currentUtilTX);
-        BigDecimal transferSpeedRX = valuePercentage(actualTransferRate, currentUtilRX);
-        BigDecimal lineSpeedTX = valuePercentage(actualLineSpeed, currentUtilTX);
-        BigDecimal lineSpeedRX = valuePercentage(actualLineSpeed, currentUtilRX);
+        BigDecimal measuredThroughputTX = DecimalHandlerUtil.valuePercentage(actualThroughput, currentUtilTX);
+        BigDecimal measuredThroughputRX = DecimalHandlerUtil.valuePercentage(actualThroughput, currentUtilRX);
+        BigDecimal transferSpeedTX = DecimalHandlerUtil.valuePercentage(actualTransferRate, currentUtilTX);
+        BigDecimal transferSpeedRX = DecimalHandlerUtil.valuePercentage(actualTransferRate, currentUtilRX);
+        BigDecimal lineSpeedTX = DecimalHandlerUtil.valuePercentage(actualLineSpeed, currentUtilTX);
+        BigDecimal lineSpeedRX = DecimalHandlerUtil.valuePercentage(actualLineSpeed, currentUtilRX);
         TrafficResponse[] trafficResponses = {
                 new TrafficResponse("Tx",
                         currentUtilTX,
@@ -131,22 +131,12 @@ public class EventService {
         return eventDisruptions;
     }
 
-    private BigDecimal percentageOfBigDecimal(BigDecimal part, BigDecimal total) {
-        if (total.compareTo(BigDecimal.ZERO) == 0) return BigDecimal.ZERO;
-        // new calculation: part * (total / 100)
-        return part.multiply(total).divide(BigDecimal.valueOf(100L), 10, RoundingMode.HALF_UP);
-    }
-
-    private BigDecimal roundToTwoDecimalPlaces(BigDecimal value) {
-        return value.setScale(2, RoundingMode.HALF_UP);
-    }
-
     private LatencyResponse getLatency() {
         String last = this.scpiTelnetService.sendCommand(EventScpiConst.latency("LAST"));
         String min = this.scpiTelnetService.sendCommand(EventScpiConst.latency("MIN"));
         String max = this.scpiTelnetService.sendCommand(EventScpiConst.latency("MAX"));
         log.info("last {}, min {}, max {}: Latency", last, min, max);
-        return new LatencyResponse(ifNullReturnZero(last), ifNullReturnZero(min), ifNullReturnZero(max));
+        return new LatencyResponse(DecimalHandlerUtil.ifNullReturnZero(last), DecimalHandlerUtil.ifNullReturnZero(min), DecimalHandlerUtil.ifNullReturnZero(max));
     }
 
     private BigDecimal ifNullReturnZero(String value) {
