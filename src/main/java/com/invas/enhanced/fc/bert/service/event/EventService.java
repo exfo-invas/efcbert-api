@@ -73,27 +73,27 @@ public class EventService {
             log.error("Failed to retrieve TX or RX data.");
             return null;
         }
-        BigDecimal txCount = ifNullReturnZero(txFrameStr);
-        BigDecimal rxCount = ifNullReturnZero(rxFrameStr);
+        BigDecimal txCount = DecimalHandlerUtil.ifNullReturnZero(txFrameStr);
+        BigDecimal rxCount = DecimalHandlerUtil.ifNullReturnZero(rxFrameStr);
         BigDecimal lostFrames = txCount.subtract(rxCount);
         BigDecimal frameLossRate = percentageOfBigDecimal(lostFrames, txCount);
-        frameLossRate = (frameLossRate.compareTo(BigDecimal.valueOf(2.0D)) < 0) ? BigDecimal.ZERO : frameLossRate.setScale(2, RoundingMode.HALF_UP);
+        frameLossRate = (frameLossRate.compareTo(BigDecimal.valueOf(2.0D)) < 0) ? BigDecimal.ZERO : frameLossRate;
         FrameLoss[] frameLoss = {
                 new FrameLoss("Tx",
-                        roundToTwoDecimalPlaces(ifNullReturnZero(txByteStr)),
-                        roundToTwoDecimalPlaces(ifNullReturnZero(txFrameRateStr)),
-                        roundToTwoDecimalPlaces(txCount),
+                        DecimalHandlerUtil.ifNullReturnZero(txByteStr),
+                        DecimalHandlerUtil.ifNullReturnZero(txFrameRateStr),
+                        txCount,
                         frameLossRate),
                 new FrameLoss("Rx",
-                        roundToTwoDecimalPlaces(ifNullReturnZero(rxByteStr)),
-                        roundToTwoDecimalPlaces(ifNullReturnZero(rxFrameRateStr)),
-                        roundToTwoDecimalPlaces(rxCount),
+                        DecimalHandlerUtil.ifNullReturnZero(rxByteStr),
+                        DecimalHandlerUtil.ifNullReturnZero(rxFrameRateStr),
+                        rxCount,
                         frameLossRate)
         };
         eventDisruptions.setFrameLoss(frameLoss);
         log.info("****Updated frameLossRate: {} in eventDisruptions***", frameLossRate);
-        BigDecimal currentUtilTX = ifNullReturnZero(txUtilStr);
-        BigDecimal currentUtilRX = ifNullReturnZero(rxUtilStr);
+        BigDecimal currentUtilTX = DecimalHandlerUtil.ifNullReturnZero(txUtilStr);
+        BigDecimal currentUtilRX = DecimalHandlerUtil.ifNullReturnZero(rxUtilStr);
         FcCalculationValues fcValues = SimpleFCRateUtil.getLineUtilizationCommand(standardTestResponse.getFcRate());
         if (fcValues == null) {
             log.error("Invalid fcRate: {}", standardTestResponse.getFcRate());
@@ -102,22 +102,23 @@ public class EventService {
         BigDecimal actualThroughput = BigDecimal.valueOf(fcValues.getActualThroughput());
         BigDecimal actualTransferRate = BigDecimal.valueOf(fcValues.getActualTransferRate());
         BigDecimal actualLineSpeed = BigDecimal.valueOf(fcValues.getLineSpeed());
-        BigDecimal measuredThroughputTX = percentageOfBigDecimal(actualThroughput, currentUtilTX);
-        BigDecimal measuredThroughputRX = percentageOfBigDecimal(actualThroughput, currentUtilRX);
-        BigDecimal transferSpeedTX = percentageOfBigDecimal(actualTransferRate, currentUtilTX);
-        BigDecimal transferSpeedRX = percentageOfBigDecimal(actualTransferRate, currentUtilRX);
-        BigDecimal lineSpeedTX = percentageOfBigDecimal(actualLineSpeed, currentUtilTX);
-        BigDecimal lineSpeedRX = percentageOfBigDecimal(actualLineSpeed, currentUtilRX);
+        BigDecimal measuredThroughputTX = valuePercentage(actualThroughput, currentUtilTX);
+        BigDecimal measuredThroughputRX = valuePercentage(actualThroughput, currentUtilRX);
+        BigDecimal transferSpeedTX = valuePercentage(actualTransferRate, currentUtilTX);
+        BigDecimal transferSpeedRX = valuePercentage(actualTransferRate, currentUtilRX);
+        BigDecimal lineSpeedTX = valuePercentage(actualLineSpeed, currentUtilTX);
+        BigDecimal lineSpeedRX = valuePercentage(actualLineSpeed, currentUtilRX);
         TrafficResponse[] trafficResponses = {
                 new TrafficResponse("Tx",
-                        roundToTwoDecimalPlaces(currentUtilTX),
-                        roundToTwoDecimalPlaces(measuredThroughputTX),
-                        roundToTwoDecimalPlaces(transferSpeedTX),
-                        roundToTwoDecimalPlaces(lineSpeedTX)),
-                new TrafficResponse("Rx", roundToTwoDecimalPlaces(currentUtilRX),
-                        roundToTwoDecimalPlaces(measuredThroughputRX),
-                        roundToTwoDecimalPlaces(transferSpeedRX),
-                        roundToTwoDecimalPlaces(lineSpeedRX))};
+                        currentUtilTX,
+                        measuredThroughputTX,
+                        transferSpeedTX,
+                        lineSpeedTX),
+                new TrafficResponse("Rx", currentUtilRX,
+                        measuredThroughputRX,
+                        transferSpeedRX,
+                        lineSpeedRX)
+        };
         eventDisruptions.setTraffic(trafficResponses);
         log.info("****Updated trafficResponses: {} in eventDisruptions****", (Object) trafficResponses);
         eventDisruptions.setLatency(getLatency());
