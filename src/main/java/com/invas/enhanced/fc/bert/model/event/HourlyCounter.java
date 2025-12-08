@@ -1,5 +1,10 @@
 package com.invas.enhanced.fc.bert.model.event;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class HourlyCounter {
     private String hoursElapsed;
     private boolean isReady;
@@ -9,19 +14,4 @@ public class HourlyCounter {
         this.isReady = isReady;
     }
 
-    public String getHoursElapsed() {
-        return hoursElapsed;
-    }
-
-    public void setHoursElapsed(String hoursElapsed) {
-        this.hoursElapsed = hoursElapsed;
-    }
-
-    public boolean isReady() {
-        return isReady;
-    }
-
-    public void setReady(boolean ready) {
-        isReady = ready;
-    }
 }
