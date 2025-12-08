@@ -13,7 +13,7 @@ public class SimpleFCRateUtil {
         "10x", "10200,1200,12.75",
         "16x", "13600,1600,14.025",
         "32x", "27200,3200,28.05",
-        "64x", "54400,6400,0"
+        "64x", "54400,6400,28.9"
     );
 
     public static FcCalculationValues getLineUtilizationCommand(String fcRate) {
