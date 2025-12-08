@@ -47,10 +47,6 @@ public class EventAggregatorConfig {
     }
 
     public ConcurrentHashMap<Integer, HourlyEvent> updateHourlyEventDisruptions() {
-        if (eventDisruptionsList.isEmpty()) {
-            log.warn("No event disruptions available. Skipping hourly event disruptions update.");
-            return null;
-        }
         HourlyEvent hourlyEvent = new HourlyEvent(
                 0,
                 getLatestEventDisruption().getTraffic()[1].getCurrentUtilization().toPlainString(),
