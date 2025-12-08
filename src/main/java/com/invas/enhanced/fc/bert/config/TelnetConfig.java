@@ -62,6 +62,15 @@ public class TelnetConfig {
         return telnetClient.getOutputStream();
     }
 
+    //Reset the connection
+    public void resetConnection() {
+        var ip = telnetClient.getRemoteAddress().getHostName();
+        var port = telnetClient.getRemotePort();
+        log.info("Resetting connection to {}:{}", ip, port);
+        disconnect();
+        getConnection(ip, port);
+    }
+
     public void disconnect() {
         try {
             telnetClient.disconnect();
