@@ -114,6 +114,10 @@ public class ScpiTelnetService {
         return null;
     }
 
+    public void resetConnection() {
+        telnetConfig.disconnect();
+    }
+
     public void disconnect() {
         telnetConfig.disconnect();
     }
