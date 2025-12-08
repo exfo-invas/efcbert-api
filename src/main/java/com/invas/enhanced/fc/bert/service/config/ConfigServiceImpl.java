@@ -8,19 +8,16 @@ import com.invas.enhanced.fc.bert.model.config.PortStatus;
 import com.invas.enhanced.fc.bert.model.config.PhysicalStatus;
 import com.invas.enhanced.fc.bert.model.config.ToolStatus;
 import com.invas.enhanced.fc.bert.contants.ConfigScpiConst;
-import com.invas.enhanced.fc.bert.model.event.EventDisruptions;
-import com.invas.enhanced.fc.bert.model.event.FrameLoss;
 import com.invas.enhanced.fc.bert.model.event.StandardTestResponse;
-import com.invas.enhanced.fc.bert.model.event.TrafficResponse;
 import com.invas.enhanced.fc.bert.service.ScpiTelnetService;
 import com.invas.enhanced.fc.bert.service.event.EventService;
 
+import com.invas.enhanced.fc.bert.utils.DecimalHandlerUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 
 @Slf4j
 @Service
@@ -40,6 +37,7 @@ public class ConfigServiceImpl implements ConfigService {
             log.info("Test control command executed successfully: {}", toggle ? "START" : "STOP");
             if (!toggle) {
                 getloggingList();
+                scpiTelnetService.resetConnection();
             }
             return true;
         } else {
@@ -120,8 +118,12 @@ public class ConfigServiceImpl implements ConfigService {
                 scpiTelnetService.sendCommand(ConfigScpiConst.fcbertConfiguration("PATTERN")),
                 scpiTelnetService.sendCommand(ConfigScpiConst.fcbertConfiguration("PATTERN")),
                 scpiTelnetService.sendCommand(ConfigScpiConst.fcbertConfiguration("FRAME-SIZE-STAT")),
-                scpiTelnetService.sendCommand(ConfigScpiConst.fcbertConfiguration("STREAM-RATE-STAT"))
+                trafficShapingDecimal(scpiTelnetService.sendCommand(ConfigScpiConst.fcbertConfiguration("STREAM-RATE-STAT")))
         );
+    }
+
+    private String trafficShapingDecimal(String value) {
+        return DecimalHandlerUtil.ifNullReturnZero(value).toPlainString();
     }
 
     public String getPSPLinkStatus() {
