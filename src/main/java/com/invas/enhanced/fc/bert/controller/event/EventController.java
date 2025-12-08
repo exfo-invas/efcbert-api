@@ -6,6 +6,7 @@ import com.invas.enhanced.fc.bert.model.event.EventDisruptions;
 import java.util.ArrayList;
 
 import com.invas.enhanced.fc.bert.model.event.HourlyEvent;
+import com.invas.enhanced.fc.bert.service.event.EventService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,9 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class EventController {
 
     private final EventAggregatorConfig eventAggregatorConfig;
+    private final EventService eventService;
 
-    public EventController(EventAggregatorConfig eventAggregatorConfig) {
+    public EventController(EventAggregatorConfig eventAggregatorConfig, EventService eventService) {
         this.eventAggregatorConfig = eventAggregatorConfig;
+        this.eventService = eventService;
     }
 
     @GetMapping("/details")
@@ -32,7 +35,9 @@ public class EventController {
 
     @GetMapping("/details/hourly")
     public ArrayList<HourlyEvent> getHourlyDisruptionsList() {
-        return eventAggregatorConfig.getHourlyEventList();
+        ArrayList<HourlyEvent> hourlyEvents = eventAggregatorConfig.getHourlyEventList();
+        eventService.setReadyForHourly(false);
+        return hourlyEvents;
     }
 
 }
