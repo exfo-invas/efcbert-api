@@ -10,6 +10,7 @@ import com.invas.enhanced.fc.bert.service.ScpiTelnetService;
 import com.invas.enhanced.fc.bert.utils.DecimalHandlerUtil;
 import com.invas.enhanced.fc.bert.utils.SimpleFCRateUtil;
 
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
+@Setter
 @Service
 public class EventService {
 
@@ -28,11 +30,10 @@ public class EventService {
     private final EventAggregatorConfig eventAggregatorConfig;
     private final StandardConfig standardConfig;
 
-    private boolean scheduledEventEnabled = false;
-    // thread-safe counter incremented by the secondly scheduled task
-    private final AtomicInteger secondsCounter = new AtomicInteger(0);
-
-    private final AtomicLong lastHourlyRunNano = new AtomicLong(System.nanoTime());
+    private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledFuture<?> secondTask;
+    private ScheduledFuture<?> hourlyTask;
+    private int hourlyCounter = 0;
 
     private boolean readyForHourly = false;
 
@@ -125,7 +126,7 @@ public class EventService {
         log.info("EventDisruptions: {}", eventDisruptions);
 
         eventDisruptions.setHourlyStatus(
-                new HourlyCounter(secondsCounter.get(), readyForHourly)
+                new HourlyCounter(getNextRunTime(), readyForHourly)
         );
         return eventDisruptions;
     }
@@ -138,60 +139,52 @@ public class EventService {
         return new LatencyResponse(DecimalHandlerUtil.ifNullReturnZero(last), DecimalHandlerUtil.ifNullReturnZero(min), DecimalHandlerUtil.ifNullReturnZero(max));
     }
 
-    private BigDecimal ifNullReturnZero(String value) {
-        return (value == null) ? BigDecimal.ZERO : new BigDecimal(value);
-    }
+    /**
+     * ================= START POLLING ==================
+     */
+    public synchronized void startScheduledEvent(boolean enabled) {
 
-    public void startScheduledEvent(boolean enabled) {
-        this.scheduledEventEnabled = enabled;
-        this.eventAggregatorConfig.generateExportFile();
-    }
+        if (enabled) {
+            log.info(" Polling Started");
 
-    @Scheduled(fixedRate = 1000L) // every second
-    private void secondlyEventDisruption() {
-        if (!this.scheduledEventEnabled) {
-            log.info("EventDisruptions not enabled");
-            return;
-        }
-        log.info("Scheduling event disruptions execution...");
-        // increment the seconds counter; when it reaches 60 trigger hourly aggregation
-        int seconds = this.secondsCounter.incrementAndGet();
-
-        long now = System.nanoTime();
-        long last = lastHourlyRunNano.get();
-
-        if (now - last >= ONE_HOUR_NANO) {
-            log.info("One hour has passed since last hourly run. Triggering hourlyEventDisruptions...");
-            readyForHourly = true;
-            // atomically acquire the hourly tick
-            if (lastHourlyRunNano.compareAndSet(last, now)) {
-                log.info("Executing hourlyEventDisruptions due to one hour elapsed...");
-                try {
-                    hourlyEventDisruptions();
-                } catch (Exception e) {
-                    log.error("Error in hourlyEventDisruptions", e);
+            // run every second
+            secondTask = executor.scheduleAtFixedRate(() -> {
+                EventDisruptions event = executeEventDisruptions();
+                log.info("Second aggregated update triggered with event: {}", event);
+                eventAggregatorConfig.updateEventDisruptionsList(event);
+                if (hourlyCounter < 2) {
+                    readyForHourly = true;
+                    eventAggregatorConfig.updateHourlyEventDisruptions();
                 }
-            }
+            }, 0, 1, TimeUnit.SECONDS);
+
+            // hourly task
+            hourlyTask = executor.scheduleAtFixedRate(() -> {
+                log.info(" Hourly aggregated update triggered");
+                eventAggregatorConfig.updateHourlyEventDisruptions();
+                readyForHourly = true;
+                hourlyCounter++;
+            }, 0, 1, TimeUnit.MINUTES); // TODO change to HOURS
         }
 
-//        if (seconds >= 3600) { // every hour
-//            // reset and call hourly aggregation
-//            this.secondsCounter.set(0);
-//            try {
-//                hourlyEventDisruptions();
-//            } catch (Exception e) {
-//                log.error("Error while executing hourlyEventDisruptions from secondlyEventDisruption", e);
-//            }
-//        }
+        /* ================= STOP POLLING ================== */
+        if (!enabled) {
+            log.info(" Polling Stopped");
+            hourlyCounter = 0;
 
-        EventDisruptions eventDisruptions = executeEventDisruptions();
-        log.info("EventDisruptions: {} to update EventList", eventDisruptions);
-        if (eventDisruptions != null) this.eventAggregatorConfig.updateEventDisruptionsList(eventDisruptions);
+            if (secondTask != null) secondTask.cancel(true);
+            if (hourlyTask != null) hourlyTask.cancel(true);
+        }
     }
 
-    private void hourlyEventDisruptions() {
-        if (!this.scheduledEventEnabled) return;
-        log.info("Hourly event disruptions execution...");
-        this.eventAggregatorConfig.updateHourlyEventDisruptions();
+    public String getNextRunTime() {
+
+        long millis = hourlyTask.getDelay(TimeUnit.MILLISECONDS);
+
+        long seconds = (millis / 1000) % 60;
+        long minutes = (millis / (1000 * 60)) % 60;
+        long hours = (millis / (1000 * 60 * 60));
+
+        return String.format("Next consolidation in %02d hr %02d min %02d sec", hours, minutes, seconds);
     }
 }

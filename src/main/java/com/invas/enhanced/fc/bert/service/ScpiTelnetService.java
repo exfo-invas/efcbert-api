@@ -83,7 +83,10 @@ public class ScpiTelnetService {
 
         if (response.contains("Connected")) {
             log.info("response contains connected {}", response);
-            return "true";
+
+            if (response.lines().count() == 1) {
+                return "true";
+            }
         }
 
         if (response.contains("Connection is not established")) {
@@ -91,10 +94,26 @@ public class ScpiTelnetService {
             return null;
         }
 
-        if (Objects.equals(command, "LINS1:SOUR:DATA:TEL:TEST OFF")) {
-            log.info("response for LINS1:SOUR:DATA:TEL:TEST OFF {}", response);
-            if (response.contains("This operation may take few minutes to complete.") || response.contains("Please wait for a while.")) {
+        if (Objects.equals(command, "LINS1:SOUR:DATA:TEL:TEST OFF")
+                || Objects.equals(command, "LINS1:SOUR:DATA:TEL:TEST ON")) {
+            log.info("response for {}: {}", command, response);
+            if (response.contains("This operation may take few minutes to complete.")
+                    || response.contains("Please wait for a while.")) {
                 return "true";
+            }
+        }
+
+        // ✅ ALWAYS extract READY> value first (multi-line safe)
+        if (response.contains("READY>")) {
+            String value = response.lines()
+                    .filter(line -> line.startsWith("READY>"))
+                    .map(line -> line.substring("READY>".length()).trim())
+                    .findFirst()
+                    .orElse(null);
+
+            if (value != null && !value.isBlank()) {
+                log.info("Extracted READY> value: {}", value);
+                return value;
             }
         }
 
@@ -102,16 +121,23 @@ public class ScpiTelnetService {
             log.info("Undefined header found in response {}", response);
             return null;
         }
-        final String prefix = "READY>";
-        if (response.startsWith(prefix)) {
-            log.info("Sanitizing response: {}", response);
-            String cleaned = response.substring(prefix.length()).trim();
-            if (!cleaned.toLowerCase().contains("error")) {
-                log.info("Sanitized response: {}", cleaned);
-                return cleaned;
+
+        return null;
+    }
+
+    private String cleanUpMultiLineResponse(String response) {
+
+        StringBuilder cleanedResponse = new StringBuilder();
+        String prefix = "READY>";
+        for (String line : response.split("\n")) {
+            if (line.startsWith(prefix)) {
+                String cleanedLine = line.substring(prefix.length()).trim();
+                cleanedResponse.append(cleanedLine).append("\n");
+            } else {
+                cleanedResponse.append(line).append("\n");
             }
         }
-        return null;
+        return cleanedResponse.toString().trim();
     }
 
     public void resetConnection() {
