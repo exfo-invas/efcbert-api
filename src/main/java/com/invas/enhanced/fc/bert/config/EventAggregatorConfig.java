@@ -22,6 +22,13 @@ public class EventAggregatorConfig {
 
     ArrayList<EventDisruptions> eventDisruptionsList = new ArrayList<>();
     ConcurrentHashMap<Integer, HourlyEvent> hourlyEventMap = new ConcurrentHashMap<>();
+    String hourlyFileName = null;
+    String fullEventFileName = null;
+    private final TestTimerService testTimerService;
+
+    public EventAggregatorConfig(TestTimerService testTimerService) {
+        this.testTimerService = testTimerService;
+    }
 
     public EventDisruptions getLatestEventDisruption() {
         if (eventDisruptionsList.isEmpty()) {
@@ -49,6 +56,7 @@ public class EventAggregatorConfig {
     public ConcurrentHashMap<Integer, HourlyEvent> updateHourlyEventDisruptions() {
         HourlyEvent hourlyEvent = new HourlyEvent(
                 0,
+                null,
                 getLatestEventDisruption().getTraffic()[1].getCurrentUtilization().toPlainString(),
                 getLatestEventDisruption().getTraffic()[1].getMeasuredThroughput().toPlainString(),
                 getLatestEventDisruption().getFrameLoss()[1].getFrameLossRate().toPlainString(),
@@ -57,20 +65,36 @@ public class EventAggregatorConfig {
         if (hourlyEventMap.isEmpty()) {
             log.info("Creating new hourly event disruptions map.");
             hourlyEvent.setNo(1);
+            hourlyEvent.setTimestamp(testTimerService.getStartTime());
             hourlyEventMap.put(1, hourlyEvent);
         } else {
             log.info("Updating existing hourly event disruptions map.");
             hourlyEvent.setNo(hourlyEventMap.size() + 1);
+            hourlyEvent.setTimestamp(testTimerService.getCurrentTime());
             hourlyEventMap.put(hourlyEventMap.size() + 1, hourlyEvent);
         }
+        return hourlyEventMap;
+    }
+
+    //End Hourly Event Disruptions
+    public ConcurrentHashMap<Integer, HourlyEvent> endHourlyEventDisruptions() {
+        HourlyEvent hourlyEvent = new HourlyEvent(
+                hourlyEventMap.size() + 1,
+                testTimerService.getEndTime(),
+                getLatestEventDisruption().getTraffic()[1].getCurrentUtilization().toPlainString(),
+                getLatestEventDisruption().getTraffic()[1].getMeasuredThroughput().toPlainString(),
+                getLatestEventDisruption().getFrameLoss()[1].getFrameLossRate().toPlainString(),
+                getLatestEventDisruption().getLatency().getLast().toPlainString()
+        );
+        hourlyEventMap.put(hourlyEventMap.size() + 1, hourlyEvent);
         return hourlyEventMap;
     }
 
     public void generateExportFile() {
         log.info("Generating export file for event disruptions...");
         // Implementation for file generation goes here
-        FileExporter.exportEventDisruptionsToCsv(eventDisruptionsList);
-        FileExporter.exportHourlyEventsToCsv(getHourlyEventList());
+        fullEventFileName = FileExporter.exportEventDisruptionsToCsv(eventDisruptionsList, testTimerService.getStartTime());
+        hourlyFileName = FileExporter.exportHourlyEventsToCsv(getHourlyEventList(), testTimerService.getStartTime());
         //Clear lists after exporting
         eventDisruptionsList.clear();
         hourlyEventMap.clear();
