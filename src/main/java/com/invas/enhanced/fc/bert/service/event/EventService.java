@@ -107,18 +107,16 @@ public class EventService {
         BigDecimal measuredThroughputRX = DecimalHandlerUtil.valuePercentage(actualThroughput, currentUtilRX);
         BigDecimal transferSpeedTX = DecimalHandlerUtil.valuePercentage(actualTransferRate, currentUtilTX);
         BigDecimal transferSpeedRX = DecimalHandlerUtil.valuePercentage(actualTransferRate, currentUtilRX);
-        BigDecimal lineSpeedTX = actualLineSpeed;
-        BigDecimal lineSpeedRX = actualLineSpeed;
         TrafficResponse[] trafficResponses = {
                 new TrafficResponse("Tx",
                         currentUtilTX,
                         measuredThroughputTX,
                         transferSpeedTX,
-                        lineSpeedTX),
+                        actualLineSpeed),
                 new TrafficResponse("Rx", currentUtilRX,
                         measuredThroughputRX,
                         transferSpeedRX,
-                        lineSpeedRX)
+                        actualLineSpeed)
         };
         eventDisruptions.setTraffic(trafficResponses);
         log.info("****Updated trafficResponses: {} in eventDisruptions****", (Object) trafficResponses);
