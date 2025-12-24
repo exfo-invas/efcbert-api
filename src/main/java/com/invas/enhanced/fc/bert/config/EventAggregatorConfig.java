@@ -1,10 +1,10 @@
 package com.invas.enhanced.fc.bert.config;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.invas.enhanced.fc.bert.model.event.HourlyEvent;
+import com.invas.enhanced.fc.bert.service.TestTimerService;
 import com.invas.enhanced.fc.bert.utils.FileExporter;
 import lombok.Getter;
 import lombok.Setter;
