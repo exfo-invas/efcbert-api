@@ -18,19 +18,12 @@ import java.util.Date;
 @Slf4j
 public class FileExporter {
 
-    private final TestTimerService testTimerService;
-
-    public FileExporter(TestTimerService testTimerService) {
-        this.testTimerService = testTimerService;
-    }
-
-
     /**
      * Export event disruptions list to CSV.
      * Fields: traffic[1].currentUtilization, traffic[1].measuredThroughput,
      * frameLoss[1].frameLossRate, latency.last
      *
-     * @return
+     * @return String file path
      */
     public static String exportEventDisruptionsToCsv(List<EventDisruptions> eventDisruptionsList, String timestamp) {
         Path filePath;
@@ -81,7 +74,7 @@ public class FileExporter {
      * Export hourly event list to CSV.
      * Columns: no,utilization,throughput,frameLoss,latency
      *
-     * @return
+     * @return String file path
      */
     public static String exportHourlyEventsToCsv(List<HourlyEvent> hourlyEventList, String timestamp) {
         Path filePath;
