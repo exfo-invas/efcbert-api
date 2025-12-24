@@ -153,8 +153,7 @@ public class EventService {
                 EventDisruptions event = executeEventDisruptions();
                 log.info("Second aggregated update triggered with event: {}", event);
                 eventAggregatorConfig.updateEventDisruptionsList(event);
-                if (hourlyCounter < 2) {
-                    readyForHourly = true;
+                if (hourlyCounter < 1) {
                     eventAggregatorConfig.updateHourlyEventDisruptions();
                 }
             }, 0, 1, TimeUnit.SECONDS);
