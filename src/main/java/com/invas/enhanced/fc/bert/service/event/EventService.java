@@ -161,13 +161,13 @@ public class EventService {
                 hourlyCounter = hourlyCounter < 3 ? ++hourlyCounter : hourlyCounter;
             }, 0, 1, TimeUnit.SECONDS);
 
-            // hourly task
-            hourlyTask = executor.scheduleAtFixedRate(() -> {
+            // hourly task - run every hour
+            // Separate executor to avoid interference with second task
+            hourlyTask = executorHourly.scheduleAtFixedRate(() -> {
                 log.info(" Hourly aggregated update triggered");
                 eventAggregatorConfig.updateHourlyEventDisruptions();
                 readyForHourly = true;
-                hourlyCounter++;
-            }, 0, 1, TimeUnit.MINUTES); // TODO change to HOURS
+            }, 1, 1, TimeUnit.HOURS);
         }
 
         /* ================= STOP POLLING ================== */
