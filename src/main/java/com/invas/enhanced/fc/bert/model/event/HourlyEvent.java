@@ -9,6 +9,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class HourlyEvent {
     private int no;
+    private String timestamp;
     private String utilization;
     private String throughput;
     private String frameLoss;
