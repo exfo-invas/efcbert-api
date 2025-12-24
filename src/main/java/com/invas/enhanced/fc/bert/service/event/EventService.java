@@ -31,6 +31,7 @@ public class EventService {
     private final StandardConfig standardConfig;
 
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+    private final ScheduledExecutorService executorHourly = Executors.newSingleThreadScheduledExecutor();
     private ScheduledFuture<?> secondTask;
     private ScheduledFuture<?> hourlyTask;
     private int hourlyCounter = 0;
@@ -106,8 +107,8 @@ public class EventService {
         BigDecimal measuredThroughputRX = DecimalHandlerUtil.valuePercentage(actualThroughput, currentUtilRX);
         BigDecimal transferSpeedTX = DecimalHandlerUtil.valuePercentage(actualTransferRate, currentUtilTX);
         BigDecimal transferSpeedRX = DecimalHandlerUtil.valuePercentage(actualTransferRate, currentUtilRX);
-        BigDecimal lineSpeedTX = DecimalHandlerUtil.valuePercentage(actualLineSpeed, currentUtilTX);
-        BigDecimal lineSpeedRX = DecimalHandlerUtil.valuePercentage(actualLineSpeed, currentUtilRX);
+        BigDecimal lineSpeedTX = actualLineSpeed;
+        BigDecimal lineSpeedRX = actualLineSpeed;
         TrafficResponse[] trafficResponses = {
                 new TrafficResponse("Tx",
                         currentUtilTX,
