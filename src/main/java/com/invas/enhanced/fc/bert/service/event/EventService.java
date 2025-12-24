@@ -156,6 +156,9 @@ public class EventService {
                 if (hourlyCounter < 1) {
                     eventAggregatorConfig.updateHourlyEventDisruptions();
                 }
+                readyForHourly = true;
+                //increment hourly counter up to 3
+                hourlyCounter = hourlyCounter < 3 ? ++hourlyCounter : hourlyCounter;
             }, 0, 1, TimeUnit.SECONDS);
 
             // hourly task
