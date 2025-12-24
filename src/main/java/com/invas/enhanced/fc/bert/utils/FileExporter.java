@@ -1,6 +1,7 @@
 package com.invas.enhanced.fc.bert.utils;
 import com.invas.enhanced.fc.bert.model.event.EventDisruptions;
 import com.invas.enhanced.fc.bert.model.event.HourlyEvent;
+import com.invas.enhanced.fc.bert.service.TestTimerService;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedWriter;
@@ -17,15 +18,24 @@ import java.util.Date;
 @Slf4j
 public class FileExporter {
 
+    private final TestTimerService testTimerService;
+
+    public FileExporter(TestTimerService testTimerService) {
+        this.testTimerService = testTimerService;
+    }
+
+
     /**
      * Export event disruptions list to CSV.
      * Fields: traffic[1].currentUtilization, traffic[1].measuredThroughput,
      * frameLoss[1].frameLossRate, latency.last
+     *
+     * @return
      */
-    public static void exportEventDisruptionsToCsv(List<EventDisruptions> eventDisruptionsList) {
+    public static String exportEventDisruptionsToCsv(List<EventDisruptions> eventDisruptionsList, String timestamp) {
         Path filePath;
         try {
-            filePath = getDefaultCsvPath("full_event");
+            filePath = getDefaultCsvPath("full_event", timestamp);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -38,7 +48,7 @@ public class FileExporter {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            return;
+            return filePath.toString();
         }
 
         try (BufferedWriter writer = Files.newBufferedWriter(filePath, StandardCharsets.UTF_8)) {
@@ -64,16 +74,19 @@ public class FileExporter {
         }
 
         log.info("Exported {} event disruptions to {}", eventDisruptionsList.size(), filePath);
+        return filePath.toString();
     }
 
     /**
      * Export hourly event list to CSV.
      * Columns: no,utilization,throughput,frameLoss,latency
+     *
+     * @return
      */
-    public static void exportHourlyEventsToCsv(List<HourlyEvent> hourlyEventList) {
+    public static String exportHourlyEventsToCsv(List<HourlyEvent> hourlyEventList, String timestamp) {
         Path filePath;
         try {
-            filePath = getDefaultCsvPath("consolidated_events");
+            filePath = getDefaultCsvPath("consolidated_events", timestamp);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -86,7 +99,7 @@ public class FileExporter {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            return;
+            return filePath.toString();
         }
 
         try (BufferedWriter writer = Files.newBufferedWriter(filePath, StandardCharsets.UTF_8)) {
@@ -108,10 +121,11 @@ public class FileExporter {
         }
 
         log.info("Exported {} hourly events to {}", hourlyEventList.size(), filePath);
+        return filePath.toString();
     }
 
     // Helper: create timestamped path on Desktop/EnhancedFCBert/
-    private static Path getDefaultCsvPath(String prefix) throws IOException {
+    private static Path getDefaultCsvPath(String prefix, String timestamp) throws IOException {
         String userHome = System.getProperty("user.home");
         String dateFolder = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
         Path folder = Paths.get(userHome, "Desktop", "EnhancedFcbert", dateFolder);
@@ -119,7 +133,6 @@ public class FileExporter {
             Files.createDirectories(folder);
         }
 
-        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String fileName = prefix + "_records_" + timestamp + ".csv";
         return folder.resolve(fileName);
     }
