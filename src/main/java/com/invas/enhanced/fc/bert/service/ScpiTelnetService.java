@@ -113,6 +113,10 @@ public class ScpiTelnetService {
 
             if (value != null && !value.isBlank()) {
                 log.info("Extracted READY> value: {}", value);
+                if (value.contains("error") || value.contains("ERROR")) {
+                    log.info("Response contains error, returning null");
+                    return null;
+                }
                 return value;
             }
         }
