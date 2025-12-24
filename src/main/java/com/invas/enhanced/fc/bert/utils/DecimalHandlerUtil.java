@@ -9,12 +9,20 @@ public class DecimalHandlerUtil {
         if (value == null) {
             return BigDecimal.ZERO;
         } else {
-            return roundToTwoDecimalPlaces(new BigDecimal(value));
+            return roundToTwoDecimalPlaces(new BigDecimal(value),2);
         }
     }
 
-    private static BigDecimal roundToTwoDecimalPlaces(BigDecimal value) {
-        return value.setScale(2, RoundingMode.HALF_UP);
+    public static BigDecimal defaultIfNullReturnZero(String value) {
+        if (value == null) {
+            return BigDecimal.ZERO;
+        } else {
+            return roundToTwoDecimalPlaces(new BigDecimal(value), 4);
+        }
+    }
+
+    private static BigDecimal roundToTwoDecimalPlaces(BigDecimal value, int scale) {
+        return value.setScale(scale, RoundingMode.HALF_UP);
     }
 
     public static BigDecimal valuePercentage(BigDecimal value, BigDecimal percentage) {
