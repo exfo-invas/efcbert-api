@@ -156,7 +156,7 @@ public class EventService {
                 }
                 readyForHourly = true;
                 //increment hourly counter up to 3
-                hourlyCounter = hourlyCounter < 3 ? ++hourlyCounter : hourlyCounter;
+                hourlyCounter = Math.min(hourlyCounter + 1, 3);
             }, 0, 1, TimeUnit.SECONDS);
 
             // hourly task - run every hour
