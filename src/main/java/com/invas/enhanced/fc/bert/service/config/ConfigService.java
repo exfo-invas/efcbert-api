@@ -1,5 +1,6 @@
 package com.invas.enhanced.fc.bert.service.config;
 
+import com.invas.enhanced.fc.bert.model.config.FileDetails;
 import com.invas.enhanced.fc.bert.model.config.FullConfigStatus;
 
 public interface ConfigService {
@@ -17,4 +18,6 @@ public interface ConfigService {
     String getPSPLink();
 
     FullConfigStatus getFullConfigStatus();
+
+    FileDetails getFileRecords();
 }

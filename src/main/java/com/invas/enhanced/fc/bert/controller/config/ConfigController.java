@@ -1,5 +1,6 @@
 package com.invas.enhanced.fc.bert.controller.config;
 
+import com.invas.enhanced.fc.bert.model.config.FileDetails;
 import com.invas.enhanced.fc.bert.model.config.FullConfigStatus;
 import com.invas.enhanced.fc.bert.service.config.ConfigService;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,11 @@ public class ConfigController {
         boolean value = configService.testControl(toggle);
         log.info("Test Control executed with result: {}", value);
         return value;
+    }
+
+    @GetMapping("/test/records")
+    public FileDetails getTestRecords() {
+        return configService.getFileRecords();
     }
 
     @GetMapping("/test/reset")

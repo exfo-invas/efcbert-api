@@ -3,14 +3,12 @@ package com.invas.enhanced.fc.bert.service.config;
 import com.invas.enhanced.fc.bert.config.EventAggregatorConfig;
 import com.invas.enhanced.fc.bert.config.StandardConfig;
 import com.invas.enhanced.fc.bert.contants.EventScpiConst;
-import com.invas.enhanced.fc.bert.model.config.FullConfigStatus;
-import com.invas.enhanced.fc.bert.model.config.PortStatus;
-import com.invas.enhanced.fc.bert.model.config.PhysicalStatus;
-import com.invas.enhanced.fc.bert.model.config.ToolStatus;
+import com.invas.enhanced.fc.bert.model.config.*;
 import com.invas.enhanced.fc.bert.contants.ConfigScpiConst;
 import com.invas.enhanced.fc.bert.model.event.StandardTestResponse;
 import com.invas.enhanced.fc.bert.service.ScpiTelnetService;
 import com.invas.enhanced.fc.bert.service.event.EventService;
+import com.invas.enhanced.fc.bert.service.TestTimerService;
 
 import com.invas.enhanced.fc.bert.utils.DecimalHandlerUtil;
 import lombok.RequiredArgsConstructor;
@@ -26,17 +24,25 @@ public class ConfigServiceImpl implements ConfigService {
     private final EventService eventService;
     private final StandardConfig standardConfig;
     private final EventAggregatorConfig eventAggregatorConfig;
+    private final TestTimerService testTimerService;
 
     @Override
     public boolean testControl(boolean toggle) {
-
+        //eventService.startScheduledEvent(toggle);
         if (scpiTelnetService.sendCommand(ConfigScpiConst.controller(toggle ? "START" : "STOP")).equalsIgnoreCase("true")) {
             eventService.startScheduledEvent(toggle);
-            log.info("Test control command executed successfully: {}", toggle ? "START" : "STOP");
-            if (!toggle) {
+            // Start or stop shared timer for test session
+            if (toggle) {
+                testTimerService.start();
+                log.info("Test timer started.");
+            } else {
+                testTimerService.stop();
+                eventAggregatorConfig.endHourlyEventDisruptions();
                 getloggingList();
                 scpiTelnetService.resetConnection();
+                log.info("Test timer stopped. Elapsed: {}", testTimerService.getElapsedHourMinute());
             }
+            log.info("Test control command executed successfully: {}", toggle ? "START" : "STOP");
             return true;
         } else {
             log.error("Failed to execute test control command: {}", toggle ? "START" : "STOP");
@@ -73,6 +79,15 @@ public class ConfigServiceImpl implements ConfigService {
                 getToolStatus(),
                 getPSPLinkStatus()
         );
+    }
+
+    @Override
+    public FileDetails getFileRecords() {
+        return new FileDetails(
+                eventAggregatorConfig.getTestTimerService().getStartTime(),
+                eventAggregatorConfig.getTestTimerService().getEndTime(),
+                eventAggregatorConfig.getFullEventFileName(),
+                eventAggregatorConfig.getHourlyFileName());
     }
 
     public PhysicalStatus getPhysicalStatus() {
