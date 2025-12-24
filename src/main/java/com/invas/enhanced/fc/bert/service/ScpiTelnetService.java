@@ -129,6 +129,28 @@ public class ScpiTelnetService {
         return null;
     }
 
+    private String retrySendCommand(String command) {
+        int attempt = 0;
+        int maxRetries = 2;
+        while (attempt < maxRetries) {
+            String response = sendCommand(command);
+            if (response != null) {
+                return response;
+            }
+            attempt++;
+            log.info("Retrying command: {} (Attempt {}/{})", command, attempt, maxRetries);
+            try {
+                Thread.sleep((long) 500);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                log.error("Retry interrupted: {}", e.getMessage(), e);
+                break;
+            }
+        }
+        log.error("Max retries reached for command: {}", command);
+        return null;
+    }
+
     private String cleanUpMultiLineResponse(String response) {
 
         StringBuilder cleanedResponse = new StringBuilder();
