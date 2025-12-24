@@ -1,6 +1,8 @@
 // language: java
 package com.invas.enhanced.fc.bert.service;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -14,26 +16,14 @@ public class TestTimerService {
     private final AtomicLong accumulatedMillis = new AtomicLong(0);
     private final AtomicReference<Instant> startInstant = new AtomicReference<>(null);
 
+    @Setter
+    @Getter
     private Duration StartedDuration;
+    @Setter
+    @Getter
     private Duration StoppedDuration;
 
-    public Duration getStartedDuration() {
-        return StartedDuration;
-    }
-
-    public void setStartedDuration(Duration startedDuration) {
-        StartedDuration = startedDuration;
-    }
-
-    public Duration getStoppedDuration() {
-        return StoppedDuration;
-    }
-
-    public void setStoppedDuration(Duration stoppedDuration) {
-        StoppedDuration = stoppedDuration;
-    }
-
-// java
+    // java
 // Add these fields and methods inside TestTimerService
 
     private final AtomicReference<Instant> lastStartInstant = new AtomicReference<>(null);
