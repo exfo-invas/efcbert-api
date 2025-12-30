@@ -125,6 +125,7 @@ public class FileExporter {
         if (!Files.exists(folder)) {
             Files.createDirectories(folder);
         }
+        timestamp = timestamp.replace(":", "-").replace(" ", "_");
 
         String fileName = prefix + "_records_" + timestamp + ".csv";
         return folder.resolve(fileName);
