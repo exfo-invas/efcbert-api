@@ -26,7 +26,9 @@ public class DecimalHandlerUtil {
     }
 
     public static BigDecimal valuePercentage(BigDecimal value, BigDecimal percentage) {
-        return value.multiply(percentage).divide(BigDecimal.valueOf(100), 10, RoundingMode.HALF_UP);
+        return value.multiply(percentage)
+                .divide(BigDecimal.valueOf(100), 10, RoundingMode.HALF_UP)
+                .setScale(2, RoundingMode.HALF_UP);
     }
 
     public static BigDecimal percentageOfBigDecimal(BigDecimal part, BigDecimal total) {
