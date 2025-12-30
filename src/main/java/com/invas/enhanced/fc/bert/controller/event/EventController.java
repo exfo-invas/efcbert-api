@@ -1,11 +1,11 @@
 package com.invas.enhanced.fc.bert.controller.event;
 
 import com.invas.enhanced.fc.bert.config.EventAggregatorConfig;
-import com.invas.enhanced.fc.bert.model.event.EventDisruptions;
+import com.invas.enhanced.fc.bert.model.event.*;
 
+import java.awt.*;
 import java.util.ArrayList;
 
-import com.invas.enhanced.fc.bert.model.event.HourlyEvent;
 import com.invas.enhanced.fc.bert.service.event.EventService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
